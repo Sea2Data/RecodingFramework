@@ -5,6 +5,7 @@
  */
 package imr.fd.ef.datarecoder;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -15,10 +16,11 @@ public class SimpleBatchRecoder implements IBatchRecoder {
 
     List<IItemRecoder> itemrecoders;
 
-    public SimpleBatchRecoder(List<IItemRecoder> itemrecoders) {
-        this.itemrecoders = itemrecoders;
-    }
 
+    public void addItemRecorder(IItemRecoder itemrecoder){
+        this.itemrecoders.add(itemrecoder);
+    }
+    
     /**
      * Fetches data using fetch methods of registered itemrecoders, and run
      * their pre-recoding tests.
@@ -32,7 +34,7 @@ public class SimpleBatchRecoder implements IBatchRecoder {
             ir.testPre();
         }
     }
-
+    
     /**
      * fetches, tests, recodes, tests and updates for all registered
      * itemrecorders
@@ -96,6 +98,15 @@ public class SimpleBatchRecoder implements IBatchRecoder {
             ir.fetch();
             ir.testPost();
         }
+    }
+
+    @Override
+    public BatchRecodingReport listPlannedRecodings() {
+        BatchRecodingReport report = new BatchRecodingReport();
+        for (IItemRecoder ir : this.itemrecoders) {
+            report.add(ir, false, "Dry-run");
+        }
+        return report;
     }
 
 }

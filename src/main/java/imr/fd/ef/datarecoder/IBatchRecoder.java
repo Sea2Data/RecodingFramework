@@ -5,18 +5,27 @@
  */
 package imr.fd.ef.datarecoder;
 
+import java.io.File;
+import java.io.Serializable;
+
 /**
  * Interface for batch recoding through API
  * To be used for automatic database updates correcting for consistent mistakes in data, or to reflect changes in data model.
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
-public interface IBatchRecoder {
+public interface IBatchRecoder extends Serializable{
     
     /**
      * Fetches data and checks conditions expected to hold pre-recoding
      * @throws RecodingException 
      */
     public void fetchAndTestBatchPre() throws RecodingException;
+    
+    /**
+     * Makes a dry-run batch recoding report, listing all registered recodings, without performing any tests or updates.
+     * @return 
+     */
+    public BatchRecodingReport listPlannedRecodings();
     
     /**
      * Recodes data in batch and returns a report of the recoding of individual items

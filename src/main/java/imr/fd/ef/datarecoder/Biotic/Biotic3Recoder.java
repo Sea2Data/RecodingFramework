@@ -11,7 +11,7 @@ import imr.fd.ef.datarecoder.IBatchRecoder;
  *
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
-public class SimpleBiotic3Recoder{
+public class Biotic3Recoder{
 
     protected String uri;
     protected String authkey;
@@ -21,10 +21,12 @@ public class SimpleBiotic3Recoder{
      * 
      * @param uri URI to Biotic API that should be used. E.g: http://tomcat7-test.imr.no:8080/apis/nmdapi/biotic/v3
      * @param key key for authenticating pushes through API.
+     * @param batchrecoder
      */
-    public SimpleBiotic3Recoder(String uri, String key){
+    public Biotic3Recoder(String uri, String key, IBatchRecoder batchrecoder){
         this.uri=uri;
         this.authkey=key;
+        this.batchrecoder=batchrecoder;
     }
     
     

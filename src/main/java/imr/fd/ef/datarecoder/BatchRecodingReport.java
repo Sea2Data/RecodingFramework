@@ -6,13 +6,14 @@
 package imr.fd.ef.datarecoder;
 
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Holds data for reporting after batch recoding
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
-class BatchRecodingReport {
+public class BatchRecodingReport implements Serializable{
     
     protected final String statusfailedstring="failed";
     protected final String statussuccededstring="OK";
