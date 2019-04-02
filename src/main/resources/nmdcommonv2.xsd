@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.imr.no/formats/nmdcommon/v2" targetNamespace="http://www.imr.no/formats/nmdcommon/v2" elementFormDefault="qualified" version="1.0">
+    <!--
+            Root elements
+    -->
+    <xs:element name="result" type="resultElementType" />
+    <xs:element name="list" type="listType" />
+    <xs:element name="link" type="linkType" />
+    <xs:element name="inserted" type="insertedType" />
+    <xs:element name="listLinks" type="listLinkType" />
+    <!--
+            Error element type.
+    -->
+    <xs:complexType name="resultElementType">
+        <xs:sequence>
+            <xs:element name="code" type="xs:integer"/>
+            <xs:element name="id" type="xs:string"/>
+            <xs:element name="message" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="listType">
+        <xs:sequence>
+            <xs:element name="row" type="rowElementType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="rowElementType">
+        <xs:sequence>
+            <xs:element name="element" type="listElementType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="rownum"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="listElementType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" />
+                <xs:attribute name="traverseTo" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="linkType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    
+    <xs:complexType name="listLinkType">
+        <xs:sequence>
+            <xs:element name="link" type="linkType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>    
+
+    <xs:complexType name="insertedType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:string" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

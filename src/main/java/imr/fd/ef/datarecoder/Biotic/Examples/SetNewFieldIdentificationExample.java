@@ -22,24 +22,31 @@ public class SetNewFieldIdentificationExample extends Biotic3Recoder{
         super(uri, key, new SimpleBatchRecoder());
     }
     
-    
-    
     /**
      * Searches through years to identify which catchsamples are to be recoded
      * @param firstyear
      * @param lastyear
      * @return 
      */
-    protected void findCatchSamples(int firstyear, int lastyear){
+    protected void makeBatchRecoding(int firstyear, int lastyear){
+        SimpleBatchRecoder batchRecoder = new SimpleBatchRecoder();
+        
+        //list all
+        
         for (int year=firstyear; year<=lastyear; year++){
             // get all mission of missiontype 4
-            // get all stations
-            // get all catchsamples with genetics == 6 or 7
-            // make itemrecoder
+            
+            //list stations
+            // for all stations
+            // list catches
+            // for all catches
+            // make itemrecorder for catches with genetics == 6 or 7
+            
         }
+        
+        this.batchrecoder = batchRecoder;
     }
     
-    //make batch recoding
     
     //make or run batch recoding
     public void main (String ... args) throws RecodingException{
@@ -48,7 +55,7 @@ public class SetNewFieldIdentificationExample extends Biotic3Recoder{
         int firstyear = 2013;
         int lastyear = 2013;
         SetNewFieldIdentificationExample ex = new SetNewFieldIdentificationExample(url, key);
-        ex.findCatchSamples(firstyear, lastyear);
+        ex.makeBatchRecoding(firstyear, lastyear);
         ex.batchrecoder.fetchAndTestBatchPre();
         BatchRecodingReport report = ex.batchrecoder.recodeBatch();
         report.writeReport(new PrintWriter(System.out));
