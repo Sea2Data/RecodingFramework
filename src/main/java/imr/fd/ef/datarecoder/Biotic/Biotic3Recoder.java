@@ -6,6 +6,7 @@
 package imr.fd.ef.datarecoder.Biotic;
 
 import imr.fd.ef.datarecoder.IBatchRecoder;
+import java.util.Set;
 
 /**
  *
@@ -28,6 +29,5 @@ public class Biotic3Recoder{
         this.authkey=key;
         this.batchrecoder=batchrecoder;
     }
-    
     
 }

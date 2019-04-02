@@ -9,6 +9,9 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
+import java.util.HashSet;
+import java.util.Set;
+import no.imr.formats.nmdcommon.v2.ListType;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -38,7 +41,6 @@ public class BioticConnectionV3Test {
         BufferedReader br = new BufferedReader(new InputStreamReader(result));
 
         boolean hasbody = false;
-        System.out.println("Output from Server .... \n");
         while ((br.readLine()) != null) {
             hasbody = true;
         }
@@ -65,6 +67,57 @@ public class BioticConnectionV3Test {
     @Test
     public void testDisconnect() {
 
+    }
+
+    /**
+     * Test of listAll method, of class BioticConnectionV3.
+     */
+    // @Test commented out to avoid traffic on API
+    public void testListAll() throws Exception {
+        System.out.println("ListAll");
+        BioticConnectionV3 instance = new BioticConnectionV3(this.url);
+        ListType result = instance.listAll();
+        assertFalse(result.getRow().isEmpty());
+    }
+
+    /**
+     * Test of findDataSets method, of class BioticConnectionV3.
+     */
+    // @Test commented out to avoid traffic on API
+    public void testFindDataSets_5args() throws Exception {
+        System.out.println("findDataSets");
+        Set<Integer> years = new HashSet<>();
+        years.add(1972);
+        Set<String> missiontypes = new HashSet<>();
+        missiontypes.add("4");
+        Set<String> platforms = null;
+        Set<Integer> missionnumbers = null;
+        Set<String> cruises = new HashSet<>();
+        cruises.add("1972002");
+        BioticConnectionV3 instance = new BioticConnectionV3(this.url);
+        Set<String> result = instance.findDataSets(years, missiontypes, platforms, missionnumbers, cruises);
+        for (String s: result){
+            System.out.println(s);
+        }
+        assertEquals(2, result.size());
+    }
+
+    /**
+     * Test of findDataSets method, of class BioticConnectionV3.
+     */
+    // @Test commented out to avoid traffic on API
+    public void testFindDataSets_Set_Set() throws Exception {
+        System.out.println("findDataSets");
+        Set<Integer> years = new HashSet<>();
+        years.add(1972);
+        Set<String> missiontypes = new HashSet<>();
+        missiontypes.add("4");
+        BioticConnectionV3 instance = new BioticConnectionV3(this.url);
+        Set<String> result = instance.findDataSets(years, missiontypes);
+        for (String s: result){
+            System.out.println(s);
+        }
+        assertEquals(3, result.size());
     }
 
 }
