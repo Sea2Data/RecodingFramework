@@ -15,15 +15,19 @@
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.8</version>
-                <!--
+                
                 <executions>
                   <execution>
                     <phase>generate-sources</phase>
                     <configuration>
                       <target>
                          <get dest="src/main/resources">
-                            <url url="http://www.imr.no/formats/nmdbiotic/v3/nmdbioticv3.xsd"/>
+                             <!--
+                                Breaks on reference to gitlab for reference xsd
+                                <url url="http://www.imr.no/formats/nmdbiotic/v3/nmdbioticv3.xsd"/>
+                            -->
                             <url url="http://www.imr.no/formats/nmdcommon/v2/nmdcommonv2.xsd"/>
+                            <url url="http://www.imr.no/formats/nmddataset/v1/nmddatasetv1.xsd"/>
                          </get>
                       </target>
                     </configuration>
@@ -32,7 +36,7 @@
                     </goals>
                   </execution>
                 </executions>
-                                -->
+                                
             </plugin>
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -95,4 +99,18 @@
             </plugin>
         </plugins>
     </build>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           targetNamespace="http://www.imr.no/formats/nmddataset/v1"
+           xmlns="http://www.imr.no/formats/nmddataset/v1">
+
+    <xs:element name="datasets" type="DatasetsType" />
+
+    <xs:element name="dataset" type="DatasetType" />
+
+    <!--
+        Datasets type.
+    -->
+    <xs:complexType name="DatasetsType">
+        <xs:sequence>
+            <xs:element name="dataset" type="DatasetType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <!--
+        Dataset type.
+    -->
+    <xs:complexType name="DatasetType">
+        <xs:sequence>
+            <xs:element name="dataType" type="dataTypeEnum" />
+            <xs:element name="datasetName" type="xs:string" minOccurs="0" maxOccurs="1"  />
+            <xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="qualityAssured" type="qualityEnum" minOccurs="1" maxOccurs="1" />
+            <xs:element name="restrictions" type="RestrictionsType" />
+            <xs:element name="owner" type="xs:string" />
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required" />
+        <xs:attribute name="created" type="xs:dateTime" use="required" />
+        <xs:attribute name="updated" type="xs:dateTime" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="RestrictionsType">
+        <xs:sequence>
+            <xs:element name="read" type="xs:string" />
+            <xs:element name="write" type="xs:string" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="qualityEnum">
+        <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="NONE" />
+            <xs:enumeration value="COMPLETE" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="dataTypeEnum">
+        <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="BIOTIC"/>
+            <xs:enumeration value="CRUISE"/>
+            <xs:enumeration value="ECHOSOUNDER"/>
+            <xs:enumeration value="CRUISESERIES"/>
+            <xs:enumeration value="SURVEYTIMESERIES"/>
+            <xs:enumeration value="STOX"/>
+            <xs:enumeration value="REFERENCE"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

@@ -31,7 +31,7 @@ public class SetNewFieldIdentificationExample extends Biotic3Recoder{
     protected void makeBatchRecoding(int firstyear, int lastyear){
         SimpleBatchRecoder batchRecoder = new SimpleBatchRecoder();
         
-        //list all
+        //list all (get missions, missiontype, startyearmin, startyearmax
         
         for (int year=firstyear; year<=lastyear; year++){
             // get all mission of missiontype 4
