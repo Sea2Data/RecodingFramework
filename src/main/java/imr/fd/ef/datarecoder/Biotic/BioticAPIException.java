@@ -5,6 +5,8 @@
  */
 package imr.fd.ef.datarecoder.Biotic;
 
+import java.net.URI;
+
 /**
  *
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
@@ -12,9 +14,11 @@ package imr.fd.ef.datarecoder.Biotic;
 public class BioticAPIException extends Exception {
 
     Integer responsecode;
+    URI uri;
     
-    public BioticAPIException(Integer response) {
+    public BioticAPIException(Integer response, URI uri) {
         this.responsecode = response;
+        this.uri = uri;
     }
     
     /**
@@ -26,4 +30,11 @@ public class BioticAPIException extends Exception {
         return this.responsecode;
     }
     
+    /**
+     * Get URI that produced this response.
+     * @return 
+     */
+    public URI getURI(){
+        return this.uri;
+    }
 }

@@ -5,7 +5,7 @@
  */
 package imr.fd.ef.datarecoder;
 
-import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class SimpleBatchRecoder implements IBatchRecoder {
 
-    List<IItemRecoder> itemrecoders;
+    List<IItemRecoder> itemrecoders = new LinkedList<>();
 
 
     public void addItemRecorder(IItemRecoder itemrecoder){

@@ -16,25 +16,20 @@ public class IdentificationRecoder implements IItemRecoder{
 
     protected String delim="|";
     
-    protected String missiontype="4";
-    protected Integer startyear;
-    protected String platform;
-    protected Integer missionnumber;
-    protected Integer serialnumber;
-    protected Integer catchsampleid;
+    String path;
+    Integer serialnumber;
+    Integer catchsampleid;
     
     //rather accept catchSampleType
-    public IdentificationRecoder(Integer startyear, String platform, Integer missionnumber, Integer serialnumber, Integer catchsampleid){
-        this.startyear = startyear;
-        this.platform = platform;
-        this.missionnumber = missionnumber;
+    public IdentificationRecoder(String path, Integer serialnumber, Integer catchsampleid){
+        this.path=path;
         this.serialnumber = serialnumber;
         this.catchsampleid = catchsampleid;
     }
     
     @Override
     public String getDescription() {
-        return this.startyear + this.delim + this.platform + this.delim + this.missiontype +  this.delim + this.missionnumber +  this.delim + this.serialnumber + this.delim + this.catchsampleid;
+        return this.path +  this.delim + this.serialnumber + this.delim + this.catchsampleid;
     }
 
     @Override

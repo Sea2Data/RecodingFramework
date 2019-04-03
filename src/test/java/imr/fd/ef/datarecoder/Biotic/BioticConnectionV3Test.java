@@ -34,9 +34,9 @@ public class BioticConnectionV3Test {
     @org.junit.Test
     public void testGet() throws Exception {
         System.out.println("get");
-        String path = "/" + URLEncoder.encode("Forskningsfartøy", this.urlencoding) + "/" + URLEncoder.encode("2018", this.urlencoding) + "/" + URLEncoder.encode("G.O.Sars_LMEL", this.urlencoding);
+        String path = "/Forskningsfartøy/2018/G.O.Sars_LMEL";
         BioticConnectionV3 instance = new BioticConnectionV3(this.url);
-        InputStream result = instance.get(path);
+        InputStream result = instance.get(path, null);
 
         BufferedReader br = new BufferedReader(new InputStreamReader(result));
 
@@ -49,17 +49,6 @@ public class BioticConnectionV3Test {
 
     }
 
-    /**
-     * Test of encodePath method, of class BioticConnectionV3.
-     */
-    @Test
-    public void testEncodePath() throws Exception {
-        System.out.println("encodePath");
-        BioticConnectionV3 instance = new BioticConnectionV3(this.url);
-        String expResult = "/" + URLEncoder.encode("Forskningsfartøy", this.urlencoding) + "/" + URLEncoder.encode("2018", this.urlencoding) + "/" + URLEncoder.encode("G.O.Sars_LMEL", this.urlencoding);
-        String result = instance.encodePath("Forskningsfartøy", "2018", "G.O.Sars_LMEL");
-        assertEquals(expResult, result);
-    }
 
     /**
      * Test of disconnect method, of class BioticConnectionV3.
