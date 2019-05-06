@@ -7,6 +7,7 @@ package imr.fd.ef.datarecoder.Biotic;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -14,6 +15,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -101,6 +105,48 @@ public class BioticConnectionV3 {
         if (this.conn != null) {
             this.conn.disconnect();
         }
+    }
+
+    /**
+     * return stream for writing put content
+     *
+     * @param path
+     * @param query
+     * @param content
+     * @return
+     * @throws IOException
+     */
+    protected void put(String path, String query, String content, String lastModifiedString) throws IOException, BioticAPIException {
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+
+        URI uri;
+        try {
+            uri = new URI(this.scheme, null, this.host, this.port, this.path + path, query, null);
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException("malformed uri");
+        }
+
+        URL url = new URL(uri.toASCIIString());
+        conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("PUT");
+        conn.setRequestProperty("Accept", "application/xml");
+        conn.setRequestProperty("User-Agent", "automaticRecoder");
+        conn.setRequestProperty("Last-Modified", lastModifiedString);
+        try {
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+            wr.write(content);
+            wr.close();
+
+            Integer response = conn.getResponseCode();
+            if (response != 200) {
+                throw new BioticAPIException(response, uri);
+            }
+        } finally {
+            this.disconnect();
+        }
+
     }
 
     /**
@@ -238,6 +284,17 @@ public class BioticConnectionV3 {
         return ll.toLinkedList(all);
     }
 
+    /**
+     * Get catchsample with given address
+     *
+     * @param missionpath
+     * @param serialnumber
+     * @param catchsampleid
+     * @return
+     * @throws JAXBException
+     * @throws IOException
+     * @throws BioticAPIException
+     */
     public CatchsampleType getCatchSample(String missionpath, Integer serialnumber, Integer catchsampleid) throws JAXBException, IOException, BioticAPIException {
         no.imr.formats.nmdbiotic.v3.CatchsampleType cs = null;
         try {
@@ -262,8 +319,28 @@ public class BioticConnectionV3 {
         return cs;
     }
 
-    public void updateCatchsample(CatchsampleType catchsample) {
+    /**
+     * Update catchsample with given address
+     *
+     * @param missionpath
+     * @param serialnumber
+     * @param catchsampleid
+     * @param catchsample new catchsample to replace the old one
+     * @param lastmodified when catchsample was last synchronised with API.
+     * @param slack slack time in minutes. Subtracted from lastmodified before
+     * updating to allow for clock synchronization issues.
+     */
+    public void updateCatchsample(String missionpath, Integer serialnumber, Integer catchsampleid, CatchsampleType catchsample, ZonedDateTime lastmodified, Integer slack) {
+        ZonedDateTime lastmodifiedwithmargin = lastmodified.minusMinutes(slack);
+        String lastmodifiedstring = lastmodified.format(DateTimeFormatter.RFC_1123_DATE_TIME);
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    /**
+     * updateCatchsample with a slack time of 10 minutes
+     */
+    public void updateCatchsample(String missionpath, Integer serialnumber, Integer catchsampleid, CatchsampleType catchsample, ZonedDateTime lastmodified) {
+        updateCatchsample(missionpath, serialnumber, catchsampleid, catchsample, lastmodified, 10);
     }
 
     /**

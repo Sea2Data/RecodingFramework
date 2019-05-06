@@ -8,9 +8,15 @@ package imr.fd.ef.datarecoder.Biotic;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.net.URLEncoder;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 import no.imr.formats.nmdcommon.v2.ListType;
 import org.junit.Test;
@@ -50,6 +56,39 @@ public class BioticConnectionV3Test {
 
     }
 
+    /**
+     * Test of get method, of class BioticConnectionV3.
+     */
+    @org.junit.Test
+    public void testPut() throws Exception {
+        System.out.println("put");
+
+        String path = "Forskningsfartøy/2013/G.O.Sars_LMEL/2013111";
+
+        BioticConnectionV3 instance = new BioticConnectionV3(this.url);
+        CatchsampleType cs = instance.getCatchSample(path, 2774, 15);
+
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime anhourago = now.minusHours(1);
+
+        String nowstring = now.format(DateTimeFormatter.RFC_1123_DATE_TIME);
+        String oldstring = anhourago.format(DateTimeFormatter.RFC_1123_DATE_TIME);
+
+        cs.setCatchcomment(oldstring);
+
+        assert false: "Fix marshalling";
+        JAXBContext jaxbContext = JAXBContext.newInstance(no.imr.formats.nmdbiotic.v3.CatchsampleType.class);
+        Marshaller m = jaxbContext.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+        StringWriter sw = new StringWriter();
+        m.marshal(cs, sw);
+
+        String result = sw.toString();
+
+        instance.put(path + "/" + "model/mission/fishstation/2774/catchsample/15", "version=3.0", result, oldstring);
+
+    }
 
     /**
      * Test of disconnect method, of class BioticConnectionV3.
@@ -86,7 +125,7 @@ public class BioticConnectionV3Test {
         cruises.add("1972002");
         BioticConnectionV3 instance = new BioticConnectionV3(this.url);
         Set<String> result = instance.findDataSets(years, missiontypes, platforms, missionnumbers, cruises);
-        for (String s: result){
+        for (String s : result) {
             System.out.println(s);
         }
         assertEquals(2, result.size());
@@ -104,7 +143,7 @@ public class BioticConnectionV3Test {
         missiontypes.add("4");
         BioticConnectionV3 instance = new BioticConnectionV3(this.url);
         Set<String> result = instance.findDataSets(years, missiontypes);
-        for (String s: result){
+        for (String s : result) {
             System.out.println(s);
         }
         assertEquals(3, result.size());
@@ -112,15 +151,16 @@ public class BioticConnectionV3Test {
 
     /**
      * testGetCatchsample
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     // @Test commented out to avoid traffic on API
-    public void testGetCatchSample() throws Exception{
+    public void testGetCatchSample() throws Exception {
         System.out.println("testGetCatchsample");
         BioticConnectionV3 instance = new BioticConnectionV3(this.url);
         CatchsampleType cs = instance.getCatchSample("Forskningsfartøy/2013/G.O.Sars_LMEL/2013111", 2774, 15);
         System.out.println(cs.getCommonname());
-        assertTrue(cs!=null);
+        assertTrue(cs != null);
     }
-    
+
 }

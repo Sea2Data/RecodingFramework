@@ -11,6 +11,8 @@ import imr.fd.ef.datarecoder.IItemRecoder;
 import imr.fd.ef.datarecoder.RecodingException;
 import imr.fd.ef.datarecoder.RecodingIssueException;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
@@ -30,6 +32,7 @@ public class IdentificationRecoder implements IItemRecoder {
     Integer catchsampleid;
     BioticConnectionV3 bioticconnection;
     CatchsampleType catchsample;
+    ZonedDateTime lastmodified;
     boolean recoded = false;
     Set<String> legalTissueSampleValuesForRecoding;
 
@@ -64,6 +67,7 @@ public class IdentificationRecoder implements IItemRecoder {
     public void fetch() {
         try {
             this.catchsample = this.bioticconnection.getCatchSample(this.path, this.serialnumber, this.catchsampleid);
+            this.lastmodified = ZonedDateTime.now();
         } catch (JAXBException | IOException | BioticAPIException ex) {
             throw new RecodingIssueException(ex);
         }
@@ -119,7 +123,7 @@ public class IdentificationRecoder implements IItemRecoder {
         if (this.catchsample == null || !this.recoded) {
             throw new RecodingIssueException("Data must be fetched and recoded before performing update");
         }
-        this.bioticconnection.updateCatchsample(this.catchsample);
+        this.bioticconnection.updateCatchsample(this.path, this.serialnumber, this.catchsampleid, this.catchsample, this.lastmodified);
     }
 
 }
