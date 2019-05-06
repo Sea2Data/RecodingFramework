@@ -238,6 +238,34 @@ public class BioticConnectionV3 {
         return ll.toLinkedList(all);
     }
 
+    public CatchsampleType getCatchSample(String missionpath, Integer serialnumber, Integer catchsampleid) throws JAXBException, IOException, BioticAPIException {
+        no.imr.formats.nmdbiotic.v3.CatchsampleType cs = null;
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(no.imr.formats.nmdbiotic.v3.ObjectFactory.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+            InputStream inStream = this.get(missionpath + "/model/mission/fishstation/" + serialnumber.toString() + "/catchsample/" + catchsampleid.toString(), "version=3.0");
+            Source source = new StreamSource(inStream);
+            cs = ((JAXBElement<no.imr.formats.nmdbiotic.v3.CatchsampleType>) jaxbUnmarshaller.unmarshal(source, no.imr.formats.nmdbiotic.v3.CatchsampleType.class)).getValue();
+            inStream.close();
+        } catch (BioticAPIException e) {
+            if (e.getResponse() == 404) {
+                return null;
+            } else {
+                throw e;
+            }
+        } finally {
+            this.disconnect();
+
+        }
+
+        return cs;
+    }
+
+    public void updateCatchsample(CatchsampleType catchsample) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     /**
      * Converts listtypes to linked list with specified types
      *

@@ -34,9 +34,10 @@ public class BatchRunner {
         FileInputStream fileIn = new FileInputStream(savedrecoding);
         ObjectInputStream in = new ObjectInputStream(fileIn);
         IBatchRecoder recoder = (IBatchRecoder) in.readObject();
+        recoder.fetchAndTestBatchPre();
         BatchRecodingReport report = recoder.recodeBatch();
-        report.writeReport(new PrintWriter(System.out));
         recoder.fetchAndTestBatchPost();
+        report.writeReport(new PrintWriter(System.out));
     }
 
     /**

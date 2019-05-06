@@ -76,9 +76,9 @@ public class SetNewFieldIdentificationExample {
                     List<CatchsampleType> cs = this.bioticconnection.listCatchsamples(path, serialn);
                     for (CatchsampleType c: cs){
                         if (c.getTissuesample()!=null && (c.getTissuesample().equals("6") || c.getTissuesample().equals("7"))){
-                            IItemRecoder itemrecoder = new IdentificationRecoder(path, serialn.intValue(), c.getCatchsampleid().intValue());
+                            IItemRecoder itemrecoder = new IdentificationRecoder(path, serialn.intValue(), c.getCatchsampleid().intValue(), this.bioticconnection);
                             batchRecoder.addItemRecorder(itemrecoder);
-                            System.out.println(itemrecoder.getDescription());
+                            System.out.println("Adding:" + itemrecoder.getDescription() + " to batch recoding.");
                         }
                         else{
                             assert c.getTissuesample()==null || legalValues.contains(c.getTissuesample());
@@ -102,10 +102,11 @@ public class SetNewFieldIdentificationExample {
         int lastyear = 2013;
         SetNewFieldIdentificationExample ex = new SetNewFieldIdentificationExample(new BioticConnectionV3(url));
         ex.makeBatchRecoding(firstyear, lastyear);
-        System.exit(0);
         ex.batchrecoder.fetchAndTestBatchPre();
+        BatchRecodingReport planned = ex.batchrecoder.listPlannedRecodings();
+        planned.writeReport(new PrintWriter(System.out));
+        System.exit(0);
         BatchRecodingReport report = ex.batchrecoder.recodeBatch();
-        report.writeReport(new PrintWriter(System.out));
         ex.batchrecoder.fetchAndTestBatchPost();
     }
 }

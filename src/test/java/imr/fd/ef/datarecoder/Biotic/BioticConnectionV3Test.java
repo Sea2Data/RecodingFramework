@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.Set;
+import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 import no.imr.formats.nmdcommon.v2.ListType;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -109,4 +110,17 @@ public class BioticConnectionV3Test {
         assertEquals(3, result.size());
     }
 
+    /**
+     * testGetCatchsample
+     * @throws Exception 
+     */
+    // @Test commented out to avoid traffic on API
+    public void testGetCatchSample() throws Exception{
+        System.out.println("testGetCatchsample");
+        BioticConnectionV3 instance = new BioticConnectionV3(this.url);
+        CatchsampleType cs = instance.getCatchSample("Forskningsfartøy/2013/G.O.Sars_LMEL/2013111", 2774, 15);
+        System.out.println(cs.getCommonname());
+        assertTrue(cs!=null);
+    }
+    
 }
