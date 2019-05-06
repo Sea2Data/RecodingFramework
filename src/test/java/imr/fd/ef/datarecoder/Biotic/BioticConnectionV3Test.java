@@ -16,7 +16,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 import no.imr.formats.nmdcommon.v2.ListType;
 import org.junit.Test;
@@ -76,16 +78,17 @@ public class BioticConnectionV3Test {
 
         cs.setCatchcomment(oldstring);
 
-        assert false: "Fix marshalling";
         JAXBContext jaxbContext = JAXBContext.newInstance(no.imr.formats.nmdbiotic.v3.CatchsampleType.class);
         Marshaller m = jaxbContext.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
+        JAXBElement<no.imr.formats.nmdbiotic.v3.CatchsampleType> jaxbElement = new JAXBElement<>(new QName("", "catchsample"), no.imr.formats.nmdbiotic.v3.CatchsampleType.class, cs);
+        
         StringWriter sw = new StringWriter();
-        m.marshal(cs, sw);
+        m.marshal(jaxbElement, sw);
 
         String result = sw.toString();
-
+        assert false: "Figure out response code";
         instance.put(path + "/" + "model/mission/fishstation/2774/catchsample/15", "version=3.0", result, oldstring);
 
     }

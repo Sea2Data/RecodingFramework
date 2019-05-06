@@ -37,4 +37,9 @@ public class BioticAPIException extends Exception {
     public URI getURI(){
         return this.uri;
     }
+    
+    @Override
+    public String toString(){
+        return "returned " + this.responsecode.toString() +"("+this.uri.toString()+")";
+    }
 }

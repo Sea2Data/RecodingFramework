@@ -131,6 +131,7 @@ public class BioticConnectionV3 {
         URL url = new URL(uri.toASCIIString());
         conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("PUT");
+        conn.setDoOutput(true);
         conn.setRequestProperty("Accept", "application/xml");
         conn.setRequestProperty("User-Agent", "automaticRecoder");
         conn.setRequestProperty("Last-Modified", lastModifiedString);
