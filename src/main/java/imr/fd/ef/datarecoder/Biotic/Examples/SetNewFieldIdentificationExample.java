@@ -91,7 +91,10 @@ public class SetNewFieldIdentificationExample {
         this.batchrecoder = batchRecoder;
     }
 
-    //make or run batch recoding
+    // make or run batch recoding
+    // option for making and saving, include progress log
+    // option for dry running, include progress log
+    // option for proper recoding, include progress log
     public static void main(String... args) throws RecodingException, IOException, JAXBException, BioticAPIException, BioticParsingException, URISyntaxException {
         String url = "http://tomcat7-test.imr.no:8080/apis/nmdapi/biotic/v3";
         String key = null;
