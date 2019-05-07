@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
-public class SimpleBatchRecoder implements IBatchRecoder {
+public abstract class SimpleBatchRecoder implements IBatchRecoder {
 
     List<IItemRecoder> itemrecoders = new LinkedList<>();
 
@@ -109,4 +109,9 @@ public class SimpleBatchRecoder implements IBatchRecoder {
         return report;
     }
 
+    @Override
+    public abstract void makeBatchRecoder() throws Exception;
+    
+    @Override
+    public abstract String getDescription();
 }

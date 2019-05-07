@@ -59,9 +59,9 @@ public class BioticConnectionV3Test {
     }
 
     /**
-     * Test of get method, of class BioticConnectionV3.
+     * Test of put method, of class BioticConnectionV3.
      */
-    @org.junit.Test
+    //@org.junit.Test
     public void testPut() throws Exception {
         System.out.println("put");
 
@@ -90,14 +90,6 @@ public class BioticConnectionV3Test {
         String result = sw.toString();
         Authenticator.prompt(this.url);
         instance.put(path + "/" + "model/mission/fishstation/2774/catchsample/15", "version=3.0", result, oldstring);
-
-    }
-
-    /**
-     * Test of disconnect method, of class BioticConnectionV3.
-     */
-    @Test
-    public void testDisconnect() {
 
     }
 

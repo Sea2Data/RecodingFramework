@@ -16,6 +16,18 @@ import java.io.Serializable;
 public interface IBatchRecoder extends Serializable{
     
     /**
+     * Returns a description of the batch recoding
+     * @return 
+     */
+    public String getDescription();
+    
+    /**
+     * Constructs batch recoder
+     * @throws Exception 
+     */
+    public void makeBatchRecoder() throws Exception;
+    
+    /**
      * Fetches data and checks conditions expected to hold pre-recoding
      * @throws RecodingException 
      */
