@@ -1,0 +1,47 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package imr.fd.ef.datarecoder.Biotic;
+
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JOptionPane;
+
+/**
+ * Authentication provided through static methods to avoid being a member of serializable objects
+ * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
+ */
+public class Authenticator {
+    
+    protected static Map<String,String> tokens = new HashMap<>();
+    
+    /**
+     * Sets token for Basic Authentication scheme to be used for given url pointing to a BioticV3 API
+     * @param url
+     * @param token 
+     */
+    public static void setToken(String url, String token){
+        Authenticator.tokens.put(url, token);
+    }
+    
+    /**
+     * Gets token for Basic Authentication scheme to be used for given url pointing to a BioticV3 API
+     * @param url
+     * @return 
+     */
+    public static String getToken(String url){
+        return Authenticator.tokens.get(url);
+    }
+
+    /**
+     * Provide dialog box for getting token for a url
+     * @param url 
+     */
+    public static void prompt(String url) {
+        String token= JOptionPane.showInputDialog("Provide Authentication token for:" + url);
+        Authenticator.tokens.put(url, token);
+    }
+    
+}

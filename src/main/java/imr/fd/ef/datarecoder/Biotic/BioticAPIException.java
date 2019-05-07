@@ -40,6 +40,7 @@ public class BioticAPIException extends Exception {
     
     @Override
     public String toString(){
-        return "returned " + this.responsecode.toString() +"("+this.uri.toString()+")";
+        String stringrep = "return code: " + this.responsecode +" ("+this.uri.toString()+")";
+        return stringrep;
     }
 }

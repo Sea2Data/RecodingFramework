@@ -88,7 +88,7 @@ public class BioticConnectionV3Test {
         m.marshal(jaxbElement, sw);
 
         String result = sw.toString();
-        assert false: "Figure out response code";
+        Authenticator.prompt(this.url);
         instance.put(path + "/" + "model/mission/fishstation/2774/catchsample/15", "version=3.0", result, oldstring);
 
     }

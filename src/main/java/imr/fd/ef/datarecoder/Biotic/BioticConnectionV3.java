@@ -130,21 +130,31 @@ public class BioticConnectionV3 {
 
         URL url = new URL(uri.toASCIIString());
         conn = (HttpURLConnection) url.openConnection();
+        OutputStreamWriter wr = null;
         conn.setRequestMethod("PUT");
         conn.setDoOutput(true);
         conn.setRequestProperty("Accept", "application/xml");
         conn.setRequestProperty("User-Agent", "automaticRecoder");
+        conn.setRequestProperty("Authorization", "Basic " + Authenticator.getToken(uri.toASCIIString()));
         conn.setRequestProperty("Last-Modified", lastModifiedString);
         try {
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+            wr = new OutputStreamWriter(conn.getOutputStream());
             wr.write(content);
-            wr.close();
 
             Integer response = conn.getResponseCode();
             if (response != 200) {
+                System.out.println(response);
                 throw new BioticAPIException(response, uri);
             }
         } finally {
+            if (wr != null) {
+                try {
+                    wr.flush();
+                    wr.close();
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+            }
             this.disconnect();
         }
 
