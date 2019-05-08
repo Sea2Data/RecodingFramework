@@ -55,6 +55,16 @@ public class BioticConnectionV3{
         this.port = uri.getPort();
         this.path = uri.getPath();
     }
+    
+    /**
+     * Convenience method for getting biotic connections to serializable classes
+     * @param url
+     * @return
+     * @throws URISyntaxException 
+     */
+    public static BioticConnectionV3 createBiotic3Conncetion(String url) throws URISyntaxException{
+        return new BioticConnectionV3(url);
+    }
 
     /**
      * Creates http connection at port 8080

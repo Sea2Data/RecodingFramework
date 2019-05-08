@@ -5,6 +5,7 @@
  */
 package imr.fd.ef.datarecoder;
 
+import imr.fd.ef.datarecoder.Biotic.Authenticator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
@@ -70,23 +71,29 @@ public class BatchrecodingUI {
             
             String filename = cmd.getOptionValue("s");
             System.out.println("Loading batch recoder from " + filename);
-            System.out.println("Simulating recoding");
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
             this.batchrecoder = (IBatchRecoder)in.readObject();
+            System.out.println("Running pre-recoding data checks ...");
             this.batchrecoder.fetchAndTestBatchPre();
+            System.out.println("Simulating recoding ...");
             BatchRecodingReport report = this.batchrecoder.recodeBatch(true);
+            System.out.println("Simulating report ...");
             report.writeReport(System.out);
             
         } else if (cmd != null && cmd.hasOption("r")) {
             
             String filename = cmd.getOptionValue("r");
             System.out.println("Loading batch recoder from " + filename);
-            System.out.println("Recoding");
+            Authenticator.prompt(this.batchrecoder.getURL());
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
             this.batchrecoder = (IBatchRecoder)in.readObject();
+            System.out.println("Running pre-recoding data checks ...");
             this.batchrecoder.fetchAndTestBatchPre();
+            System.out.println("Recoding ...");
             BatchRecodingReport report = this.batchrecoder.recodeBatch(false);
+            System.out.println("Running post-recoding data checks ...");
             this.batchrecoder.fetchAndTestBatchPost();
+            System.out.println("Recoding report");
             report.writeReport(System.out);
             
         } else if (cmd != null && cmd.hasOption("l")) {

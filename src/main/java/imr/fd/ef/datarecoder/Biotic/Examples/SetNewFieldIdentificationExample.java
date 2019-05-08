@@ -12,6 +12,7 @@ import imr.fd.ef.datarecoder.Biotic.BioticConnectionV3;
 import imr.fd.ef.datarecoder.Biotic.BioticParsingException;
 import imr.fd.ef.datarecoder.IItemRecoder;
 import imr.fd.ef.datarecoder.RecodingDataTestException;
+import imr.fd.ef.datarecoder.RecodingIssueException;
 import imr.fd.ef.datarecoder.SimpleBatchRecoder;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -21,6 +22,8 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 import no.imr.formats.nmdbiotic.v3.FishstationType;
@@ -36,7 +39,6 @@ import no.imr.formats.nmdbiotic.v3.FishstationType;
  */
 public class SetNewFieldIdentificationExample extends SimpleBatchRecoder {
 
-    protected BioticConnectionV3 bioticconnection;
     protected SimpleBatchRecoder batchrecoder;
     protected int firstyear;
     protected int lastyear;
@@ -44,19 +46,28 @@ public class SetNewFieldIdentificationExample extends SimpleBatchRecoder {
     /**
      * Recoding is performed for firstyear to lastyear inclusive
      *
-     * @param bioticconnection
+     * @param biotic3url url for biotic 3 API. Should be acceptable by BioticConnectionV3.createBiotic3Conncetion(String)
      * @param firstyear
      * @param lastyear
      */
-    public SetNewFieldIdentificationExample(BioticConnectionV3 bioticconnection, int firstyear, int lastyear) {
-        this.bioticconnection = bioticconnection;
+    public SetNewFieldIdentificationExample(String biotic3url, int firstyear, int lastyear) throws URISyntaxException {
+        super(biotic3url);
+        BioticConnectionV3.createBiotic3Conncetion(biotic3url); // testing url formatting
         this.firstyear = firstyear;
         this.lastyear = lastyear;
+        
     }
 
     @Override
     public void makeBatchRecoder(PrintStream progress) throws IOException, JAXBException, BioticAPIException, BioticParsingException {
 
+        BioticConnectionV3 bioticconn;
+        try {
+            bioticconn = BioticConnectionV3.createBiotic3Conncetion(this.apiurl);
+        } catch (URISyntaxException ex) {
+            throw new RecodingIssueException(ex);
+        }
+        
         Set<String> missiontypes = new HashSet<>();
         missiontypes.add("4");
         Set<Integer> years = new HashSet<>();
@@ -64,7 +75,7 @@ public class SetNewFieldIdentificationExample extends SimpleBatchRecoder {
             years.add(year);
         }
 
-        Set<String> datasets = this.bioticconnection.findDataSets(years, missiontypes);
+        Set<String> datasets = bioticconn.findDataSets(years, missiontypes);
 
         //legal values for genetics / tissuesample that are not handled
         Set<String> legalValues = new HashSet<>();
@@ -75,14 +86,19 @@ public class SetNewFieldIdentificationExample extends SimpleBatchRecoder {
         legalValues.add("5");
 
         for (String path : datasets) {
-            List<FishstationType> fs = this.bioticconnection.listFishstation(path);
+            List<FishstationType> fs = bioticconn.listFishstation(path);
             for (FishstationType f : fs) {
                 BigInteger serialn = f.getSerialnumber();
 
-                List<CatchsampleType> cs = this.bioticconnection.listCatchsamples(path, serialn);
+                List<CatchsampleType> cs = bioticconn.listCatchsamples(path, serialn);
                 for (CatchsampleType c : cs) {
                     if (c.getTissuesample() != null && (c.getTissuesample().equals("6") || c.getTissuesample().equals("7"))) {
-                        IItemRecoder itemrecoder = new IdentificationRecoder(path, serialn.intValue(), c.getCatchsampleid().intValue(), this.bioticconnection);
+                        IItemRecoder itemrecoder;
+                        try {
+                            itemrecoder = new IdentificationRecoder(path, serialn.intValue(), c.getCatchsampleid().intValue(), this.apiurl);
+                        } catch (URISyntaxException ex) {
+                            throw new RecodingIssueException(ex);
+                        }
                         this.addItemRecorder(itemrecoder);
                         if (progress != null) {
                             progress.println("Adding:" + itemrecoder.getDescription() + " to batch recoding.");
@@ -111,7 +127,7 @@ public class SetNewFieldIdentificationExample extends SimpleBatchRecoder {
         String key = null;
         int firstyear = 2013;
         int lastyear = 2013;
-        SetNewFieldIdentificationExample ex = new SetNewFieldIdentificationExample(new BioticConnectionV3(url), firstyear, lastyear);
+        SetNewFieldIdentificationExample ex = new SetNewFieldIdentificationExample(url, firstyear, lastyear);
 
         BatchrecodingUI ui = new BatchrecodingUI(ex);
         ui.cli("-c", "arg");

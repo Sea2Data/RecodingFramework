@@ -9,7 +9,10 @@ import imr.fd.ef.datarecoder.IItemRecoder;
 import imr.fd.ef.datarecoder.RecodingDataTestException;
 import imr.fd.ef.datarecoder.RecodingIssueException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 
@@ -23,7 +26,7 @@ public class DummyItemRecoder implements IItemRecoder{
     String path;
     Integer serialnumber;
     Integer catchsampleid;
-    BioticConnectionV3 bioticconnection;
+    String biotic3url;
     CatchsampleType catchsample;
     ZonedDateTime lastmodified;
     String newcomment;
@@ -36,13 +39,14 @@ public class DummyItemRecoder implements IItemRecoder{
      * @param path
      * @param serialnumber
      * @param catchsampleid
-     * @param bioticconnection
+     * @param biotic3url
      */
-    public DummyItemRecoder(String path, Integer serialnumber, Integer catchsampleid, BioticConnectionV3 bioticconnection) {
+    public DummyItemRecoder(String path, Integer serialnumber, Integer catchsampleid, String biotic3url) throws URISyntaxException {
+        BioticConnectionV3.createBiotic3Conncetion(biotic3url); // testing url formatting
         this.path = path;
         this.serialnumber = serialnumber;
         this.catchsampleid = catchsampleid;
-        this.bioticconnection = bioticconnection;
+        this.biotic3url = biotic3url;
         this.catchsample = null;
         ZonedDateTime now = ZonedDateTime.now();
         this.newcomment = "DummyItemReoder" + now.toString();
@@ -59,9 +63,9 @@ public class DummyItemRecoder implements IItemRecoder{
     @Override
     public void fetch() {
         try {
-            this.catchsample = this.bioticconnection.getCatchSample(this.path, this.serialnumber, this.catchsampleid);
+            this.catchsample = BioticConnectionV3.createBiotic3Conncetion(biotic3url).getCatchSample(this.path, this.serialnumber, this.catchsampleid);
             this.lastmodified = ZonedDateTime.now();
-        } catch (JAXBException | IOException | BioticAPIException ex) {
+        } catch (JAXBException | IOException | BioticAPIException | URISyntaxException ex) {
             throw new RecodingIssueException(ex);
         }
     }
@@ -96,8 +100,8 @@ public class DummyItemRecoder implements IItemRecoder{
     @Override
     public void update() {
         try {
-            this.bioticconnection.updateCatchsample(this.path, this.serialnumber, this.catchsampleid, this.catchsample, this.lastmodified, 0);
-        } catch (JAXBException | IOException | BioticAPIException ex) {
+            BioticConnectionV3.createBiotic3Conncetion(biotic3url).updateCatchsample(this.path, this.serialnumber, this.catchsampleid, this.catchsample, this.lastmodified, 0);
+        } catch (JAXBException | IOException | BioticAPIException | URISyntaxException ex) {
             throw new RecodingIssueException(ex);
         }
     }    

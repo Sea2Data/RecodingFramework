@@ -57,5 +57,11 @@ public interface IBatchRecoder extends Serializable{
     public void fetchAndTestBatchPost() throws RecodingDataTestException;
     
     public void save(File file) throws IOException;
+
+    /**
+     * URL for API to recode against.
+     * @return 
+     */
+    public String getURL();
     
 }

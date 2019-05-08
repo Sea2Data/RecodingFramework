@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,9 +20,14 @@ import java.util.List;
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
 public abstract class SimpleBatchRecoder implements IBatchRecoder {
-
+    
     List<IItemRecoder> itemrecoders = new LinkedList<>();
+    protected String apiurl;
 
+    public SimpleBatchRecoder(String url) throws URISyntaxException{
+        this.apiurl = url;
+    }
+    
     public void addItemRecorder(IItemRecoder itemrecoder) {
         this.itemrecoders.add(itemrecoder);
     }
@@ -149,5 +155,10 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
      */
     @Override
     public abstract String getDescription();
+    
+    @Override
+    public String getURL(){
+        return this.apiurl;
+    }
 
 }

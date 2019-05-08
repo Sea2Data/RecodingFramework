@@ -49,7 +49,7 @@ public class Authenticator {
      * @param url 
      */
     public static void prompt(String url) {
-        String token= JOptionPane.showInputDialog("Provide Authentication token for:" + url);
+        String token= JOptionPane.showInputDialog("Provide Authentication token (<user>:<passwd>) for:" + url);
         Authenticator.tokens.put(url, token);
     }
     

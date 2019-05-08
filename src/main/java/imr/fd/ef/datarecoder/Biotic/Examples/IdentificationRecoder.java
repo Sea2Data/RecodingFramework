@@ -11,9 +11,12 @@ import imr.fd.ef.datarecoder.IItemRecoder;
 import imr.fd.ef.datarecoder.RecodingDataTestException;
 import imr.fd.ef.datarecoder.RecodingIssueException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 
@@ -30,17 +33,18 @@ public class IdentificationRecoder implements IItemRecoder {
     String path;
     Integer serialnumber;
     Integer catchsampleid;
-    BioticConnectionV3 bioticconnection;
+    String biotic3url;
     CatchsampleType catchsample;
     ZonedDateTime lastmodified;
     boolean recoded = false;
     Set<String> legalTissueSampleValuesForRecoding;
 
-    public IdentificationRecoder(String path, Integer serialnumber, Integer catchsampleid, BioticConnectionV3 bioticconnection) {
+    public IdentificationRecoder(String path, Integer serialnumber, Integer catchsampleid, String biotic3url) throws URISyntaxException {
+        BioticConnectionV3.createBiotic3Conncetion(biotic3url); // testing url formatting
         this.path = path;
         this.serialnumber = serialnumber;
         this.catchsampleid = catchsampleid;
-        this.bioticconnection = bioticconnection;
+        this.biotic3url = biotic3url;
         this.catchsample = null;
         
         this.legalTissueSampleValuesForRecoding = new HashSet<>();
@@ -64,9 +68,9 @@ public class IdentificationRecoder implements IItemRecoder {
     @Override
     public void fetch() {
         try {
-            this.catchsample = this.bioticconnection.getCatchSample(this.path, this.serialnumber, this.catchsampleid);
+            this.catchsample = BioticConnectionV3.createBiotic3Conncetion(this.biotic3url).getCatchSample(this.path, this.serialnumber, this.catchsampleid);
             this.lastmodified = ZonedDateTime.now();
-        } catch (JAXBException | IOException | BioticAPIException ex) {
+        } catch (JAXBException | IOException | BioticAPIException | URISyntaxException ex) {
             throw new RecodingIssueException(ex);
         }
     }
@@ -122,8 +126,8 @@ public class IdentificationRecoder implements IItemRecoder {
             throw new RecodingIssueException("Data must be fetched and recoded before performing update");
         }
         try {
-            this.bioticconnection.updateCatchsample(this.path, this.serialnumber, this.catchsampleid, this.catchsample, this.lastmodified);
-        } catch (JAXBException | IOException | BioticAPIException ex) {
+            BioticConnectionV3.createBiotic3Conncetion(this.biotic3url).updateCatchsample(this.path, this.serialnumber, this.catchsampleid, this.catchsample, this.lastmodified);
+        } catch (JAXBException | IOException | BioticAPIException | URISyntaxException ex) {
             throw new RecodingIssueException(ex);
         }
     }

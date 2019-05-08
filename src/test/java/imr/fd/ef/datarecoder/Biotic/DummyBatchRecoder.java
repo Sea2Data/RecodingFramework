@@ -24,10 +24,12 @@ import no.imr.formats.nmdbiotic.v3.FishstationType;
  */
 public class DummyBatchRecoder extends SimpleBatchRecoder {
 
-    protected BioticConnectionV3 bioticconnection;
 
-    public DummyBatchRecoder(BioticConnectionV3 bioticconnection) {
-        this.bioticconnection = bioticconnection;
+    public DummyBatchRecoder(String biotic3url) throws URISyntaxException {
+        super(biotic3url);
+        assert this.apiurl!=null;
+        BioticConnectionV3.createBiotic3Conncetion(biotic3url); // testing url formatting
+        
     }
 
     /**
@@ -37,26 +39,28 @@ public class DummyBatchRecoder extends SimpleBatchRecoder {
      */
     @Override
     public void makeBatchRecoder(PrintStream progress) throws Exception {
+        BioticConnectionV3 bc = BioticConnectionV3.createBiotic3Conncetion(apiurl);
+        
         Set<Integer> years = new HashSet<>();
         years.add(1972);
         Set<String> missiontypes = new HashSet<>();
         missiontypes.add("4");
-        Set<String> datasets = this.bioticconnection.findDataSets(years, missiontypes);
+        Set<String> datasets = bc.findDataSets(years, missiontypes);
 
         if (progress!=null){
             progress.println("Datasets: " + datasets.size());
         }
         
         for (String path : datasets) {
-            List<FishstationType> fs = this.bioticconnection.listFishstation(path);
+            List<FishstationType> fs = bc.listFishstation(path);
             for (int i = 0; i < 2; i++) {
                 FishstationType f = fs.get(i);
                 progress.println("serialn: " + f.getSerialnumber());
                 BigInteger serialn = f.getSerialnumber();
-                List<CatchsampleType> cs = this.bioticconnection.listCatchsamples(path, serialn);
+                List<CatchsampleType> cs = bc.listCatchsamples(path, serialn);
                 CatchsampleType c = cs.get(0);
                 progress.println("catchsampleids: " + c.getCatchsampleid());
-                IItemRecoder itemrecoder = new DummyItemRecoder(path, serialn.intValue(), c.getCatchsampleid().intValue(), this.bioticconnection);
+                IItemRecoder itemrecoder = new DummyItemRecoder(path, serialn.intValue(), c.getCatchsampleid().intValue(), this.apiurl);
                 this.addItemRecorder(itemrecoder);
             }
             break;
@@ -73,7 +77,7 @@ public class DummyBatchRecoder extends SimpleBatchRecoder {
         String key = null;
         int firstyear = 2013;
         int lastyear = 2013;
-        DummyBatchRecoder ex = new DummyBatchRecoder(new BioticConnectionV3(url));
+        DummyBatchRecoder ex = new DummyBatchRecoder(url);
         System.out.println("Make recoder");
         ex.makeBatchRecoder(System.out);
         System.out.println("List recoder");
@@ -96,11 +100,19 @@ public class DummyBatchRecoder extends SimpleBatchRecoder {
         String key = null;
         int firstyear = 2013;
         int lastyear = 2013;
-        DummyBatchRecoder ex = new DummyBatchRecoder(new BioticConnectionV3(url));
+        DummyBatchRecoder ex = new DummyBatchRecoder(url);
         
         BatchrecodingUI ui = new BatchrecodingUI(ex);
         ui.cli("-h");
+        System.out.println("---");
         ui.cli("-c", System.getProperty("user.home") + "/temp/recodingtest/dummyrecoding.recoding");
+        System.out.println("---");
+        ui.cli("-l", System.getProperty("user.home") + "/temp/recodingtest/dummyrecoding.recoding");
+        System.out.println("---");
+        ui.cli("-s", System.getProperty("user.home") + "/temp/recodingtest/dummyrecoding.recoding");
+        System.out.println("---");
+        ui.cli("-r", System.getProperty("user.home") + "/temp/recodingtest/dummyrecoding.recoding");
+        System.out.println("---");
         
     }
     
