@@ -5,6 +5,12 @@
  */
 package imr.fd.ef.datarecoder;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,11 +22,10 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
 
     List<IItemRecoder> itemrecoders = new LinkedList<>();
 
-
-    public void addItemRecorder(IItemRecoder itemrecoder){
+    public void addItemRecorder(IItemRecoder itemrecoder) {
         this.itemrecoders.add(itemrecoder);
     }
-    
+
     /**
      * Fetches data using fetch methods of registered itemrecoders, and run
      * their pre-recoding tests.
@@ -34,15 +39,9 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
             ir.testPre();
         }
     }
-    
-    /**
-     * fetches, tests, recodes, tests and updates for all registered
-     * itemrecorders
-     *
-     * @return report of recoding
-     */
+
     @Override
-    public BatchRecodingReport recodeBatch() {
+    public BatchRecodingReport recodeBatch(boolean simulate) {
         BatchRecodingReport report = new BatchRecodingReport();
 
         for (IItemRecoder ir : this.itemrecoders) {
@@ -72,7 +71,7 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
                     reported = true;
                 }
             }
-            if (!reported) {
+            if (!reported && !simulate) {
                 try {
                     ir.update();
                 } catch (RecodingException ex) {
@@ -100,6 +99,11 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
         }
     }
 
+    /**
+     * Lists all recodings of this batch recoder
+     *
+     * @return
+     */
     @Override
     public BatchRecodingReport listPlannedRecodings() {
         BatchRecodingReport report = new BatchRecodingReport();
@@ -109,9 +113,38 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
         return report;
     }
 
+    /**
+     * serializes batchrecoder
+     * @param file
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
     @Override
-    public abstract void makeBatchRecoder() throws Exception;
-    
+    public void save(File file) throws FileNotFoundException, IOException {
+        FileOutputStream fileOut = null;
+        ObjectOutputStream objectOut = null;
+        try {
+            fileOut = new FileOutputStream(file);
+            objectOut = new ObjectOutputStream(fileOut);
+            objectOut.writeObject(this);
+
+        } finally {
+            objectOut.close();
+            fileOut.close();
+        }
+
+    }
+
+    @Override
+    public abstract void makeBatchRecoder(PrintStream progress) throws Exception;
+
+    /**
+     * Detailed description of batch recoder. Should clearly explain the
+     * recoding for documentation purposes.
+     *
+     * @return
+     */
     @Override
     public abstract String getDescription();
+
 }

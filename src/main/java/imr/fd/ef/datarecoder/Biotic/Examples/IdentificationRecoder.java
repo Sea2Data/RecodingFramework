@@ -11,17 +11,15 @@ import imr.fd.ef.datarecoder.IItemRecoder;
 import imr.fd.ef.datarecoder.RecodingException;
 import imr.fd.ef.datarecoder.RecodingIssueException;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 
 /**
- * For updating a catchsample line with corrected identification codes.
+ * For updating a catchsample line with corrected codes for the field 'identification' introduced in biotic3.
+ * This information was preciously coded in the field 'genetics' in biotic 1.4 which has been populated in the field 'tissuesample' in biotic 3.
  *
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
@@ -38,18 +36,16 @@ public class IdentificationRecoder implements IItemRecoder {
     boolean recoded = false;
     Set<String> legalTissueSampleValuesForRecoding;
 
-    //rather accept catchSampleType
     public IdentificationRecoder(String path, Integer serialnumber, Integer catchsampleid, BioticConnectionV3 bioticconnection) {
         this.path = path;
         this.serialnumber = serialnumber;
         this.catchsampleid = catchsampleid;
         this.bioticconnection = bioticconnection;
         this.catchsample = null;
-
+        
         this.legalTissueSampleValuesForRecoding = new HashSet<>();
         this.legalTissueSampleValuesForRecoding.add("7");
         this.legalTissueSampleValuesForRecoding.add("6");
-
     }
 
     @Override

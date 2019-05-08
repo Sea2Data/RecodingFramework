@@ -5,7 +5,7 @@
  */
 package imr.fd.ef.datarecoder;
 
-import java.io.PrintWriter;
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class BatchRecodingReport implements Serializable{
      * writes report to writer
      * @param writer 
      */
-    public void writeReport(PrintWriter writer){
+    public void writeReport(PrintStream writer){
         assert itemrecodings.size() == recodingstatus.size();
         assert itemrecodings.size() == reasons.size();
         

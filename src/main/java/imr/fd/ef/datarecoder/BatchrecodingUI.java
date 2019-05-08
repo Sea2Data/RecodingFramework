@@ -5,9 +5,9 @@
  */
 package imr.fd.ef.datarecoder;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.naming.OperationNotSupportedException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -16,7 +16,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 /**
- *
+ * User interface(s) for Batch Recodings
+ * 
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
 public class BatchrecodingUI {
@@ -27,6 +28,11 @@ public class BatchrecodingUI {
         this.batchrecoder = batchrecoder;
     }
 
+    /**
+     * Initiates command line interface with the given command line arguments
+     * @param args
+     * @throws Exception 
+     */
     public void cli(String... args) throws Exception {
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
@@ -52,13 +58,47 @@ public class BatchrecodingUI {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(this.batchrecoder.getDescription(), options);
         } else if (cmd != null && cmd.hasOption("c")) {
-            throw new OperationNotSupportedException("c");
+            
+            String filename = cmd.getOptionValue("c");
+            System.out.println("Making batch recoder");
+            this.batchrecoder.makeBatchRecoder(System.out);
+            System.out.println("Saving batch recoder to " + filename);
+            File file = new File(filename);
+            this.batchrecoder.save(file);
+            
         } else if (cmd != null && cmd.hasOption("s")) {
-            throw new OperationNotSupportedException("s");
+            
+            String filename = cmd.getOptionValue("s");
+            System.out.println("Loading batch recoder from " + filename);
+            System.out.println("Simulating recoding");
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
+            this.batchrecoder = (IBatchRecoder)in.readObject();
+            this.batchrecoder.fetchAndTestBatchPre();
+            BatchRecodingReport report = this.batchrecoder.recodeBatch(true);
+            report.writeReport(System.out);
+            
         } else if (cmd != null && cmd.hasOption("r")) {
-            throw new OperationNotSupportedException("r");
+            
+            String filename = cmd.getOptionValue("r");
+            System.out.println("Loading batch recoder from " + filename);
+            System.out.println("Recoding");
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
+            this.batchrecoder = (IBatchRecoder)in.readObject();
+            this.batchrecoder.fetchAndTestBatchPre();
+            BatchRecodingReport report = this.batchrecoder.recodeBatch(false);
+            this.batchrecoder.fetchAndTestBatchPost();
+            report.writeReport(System.out);
+            
         } else if (cmd != null && cmd.hasOption("l")) {
-            throw new OperationNotSupportedException("l");
+            
+            String filename = cmd.getOptionValue("l");
+            System.out.println("Loading batch recoder from " + filename);
+            System.out.println("Listing recoding");
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
+            this.batchrecoder = (IBatchRecoder)in.readObject();
+            BatchRecodingReport listing = this.batchrecoder.listPlannedRecodings();
+            listing.writeReport(System.out);
+            
         } else {
             System.out.println("Could not parse arguments");
             HelpFormatter formatter = new HelpFormatter();
