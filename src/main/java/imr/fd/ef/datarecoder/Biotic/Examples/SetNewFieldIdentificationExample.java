@@ -11,19 +11,15 @@ import imr.fd.ef.datarecoder.Biotic.BioticAPIException;
 import imr.fd.ef.datarecoder.Biotic.BioticConnectionV3;
 import imr.fd.ef.datarecoder.Biotic.BioticParsingException;
 import imr.fd.ef.datarecoder.IItemRecoder;
-import imr.fd.ef.datarecoder.RecodingDataTestException;
 import imr.fd.ef.datarecoder.RecodingIssueException;
 import imr.fd.ef.datarecoder.SimpleBatchRecoder;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 import no.imr.formats.nmdbiotic.v3.FishstationType;
@@ -130,15 +126,6 @@ public class SetNewFieldIdentificationExample extends SimpleBatchRecoder {
         SetNewFieldIdentificationExample ex = new SetNewFieldIdentificationExample(url, firstyear, lastyear);
 
         BatchrecodingUI ui = new BatchrecodingUI(ex);
-        ui.cli("-c", "arg");
-
-        System.exit(0);
-        ex.makeBatchRecoder(System.out);
-        ex.fetchAndTestBatchPre();
-        BatchRecodingReport planned = ex.listPlannedRecodings();
-        planned.writeReport(new PrintStream(System.out));
-        System.exit(0);
-        BatchRecodingReport report = ex.recodeBatch(true);
-        ex.fetchAndTestBatchPost();
+        ui.cli(args);
     }
 }
