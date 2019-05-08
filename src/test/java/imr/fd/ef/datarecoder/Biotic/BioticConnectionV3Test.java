@@ -6,27 +6,23 @@
 package imr.fd.ef.datarecoder.Biotic;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
-import java.util.TimeZone;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 import no.imr.formats.nmdcommon.v2.ListType;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  *
@@ -37,8 +33,32 @@ public class BioticConnectionV3Test {
     protected String url;
     protected String urlencoding = "UTF-8";
 
-    public BioticConnectionV3Test() {
+    public BioticConnectionV3Test() throws Exception{
         url = "http://tomcat7-test.imr.no:8080/apis/nmdapi/biotic/v3";
+        loadTestAuth();
+        try {
+            
+            Authenticator.getToken(url);
+        } catch (Exception e) {
+            Authenticator.setToken(url, BioticConnectionV3Test.loadTestAuth());
+        }
+
+    }
+
+    protected static String loadTestAuth() throws Exception {
+        InputStream input = BioticConnectionV3Test.class.getClassLoader().getResourceAsStream("testauth.properties");
+        System.out.println(input);
+        Properties prop = new Properties();
+
+        // load a properties file
+        prop.load(input);
+
+        // get the property value and print it out
+        String user = prop.getProperty("testuser");
+        String passwd = prop.getProperty("testpassword");
+        
+        return user + ":" + passwd;
+
     }
 
     /**
@@ -61,7 +81,7 @@ public class BioticConnectionV3Test {
         instance.disconnect();
 
     }
-    
+
     /**
      * Test of put method, of class BioticConnectionV3.
      */
@@ -78,38 +98,30 @@ public class BioticConnectionV3Test {
         ZonedDateTime anhourago = now.minusHours(1);
 
         String oldstring = anhourago.format(DateTimeFormatter.RFC_1123_DATE_TIME);
-        
+
         cs.setCatchcomment(oldstring);
 
         JAXBContext jaxbContext = JAXBContext.newInstance(no.imr.formats.nmdbiotic.v3.CatchsampleType.class);
         Marshaller m = jaxbContext.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-        JAXBElement<no.imr.formats.nmdbiotic.v3.CatchsampleType> jaxbElement = new JAXBElement<>(new QName("", "catchsample"), no.imr.formats.nmdbiotic.v3.CatchsampleType.class, cs);
-        
+        JAXBElement<no.imr.formats.nmdbiotic.v3.CatchsampleType> jaxbElement = new JAXBElement<>(new QName("http://www.imr.no/formats/nmdbiotic/v3", "catchsample", ""), no.imr.formats.nmdbiotic.v3.CatchsampleType.class, cs);
+
         StringWriter sw = new StringWriter();
         m.marshal(jaxbElement, sw);
-        
+
         String result = sw.toString();
 
-        // fix this
-        result = result.replace(":ns2", "");
-        result = result.replace("ns2:", "");
-        System.out.print(result);
-        
         // test update
-        Authenticator.prompt(this.url);
-        instance.put(path + "/" + "model/mission/fishstation/2774/catchsample/15", "version=3.0", result, now.toEpochSecond()*1000);
-        
+        instance.put(path + "/" + "model/mission/fishstation/2774/catchsample/15", "version=3.0", result, now.toEpochSecond() * 1000);
+
         // test that error is thrown when not authenticated correctly
-        try{
+        try {
             Authenticator.setToken(this.url, "wrongtoken");
-            instance.put(path + "/" + "model/mission/fishstation/2774/catchsample/15", "version=3.0", result, anhourago.toEpochSecond()*1000);            
+            instance.put(path + "/" + "model/mission/fishstation/2774/catchsample/15", "version=3.0", result, anhourago.toEpochSecond() * 1000);
+        } catch (BioticAPIException e) {
+            assertEquals(e.responsecode.intValue(), 403);
         }
-        catch(BioticAPIException e){
-            assertEquals(e.responsecode.intValue(),403);
-        }
-          
 
     }
 
@@ -169,13 +181,27 @@ public class BioticConnectionV3Test {
      *
      * @throws Exception
      */
-    // @Test commented out to avoid traffic on API
+    @Test
     public void testGetCatchSample() throws Exception {
         System.out.println("testGetCatchsample");
         BioticConnectionV3 instance = new BioticConnectionV3(this.url);
         CatchsampleType cs = instance.getCatchSample("Forskningsfartøy/2013/G.O.Sars_LMEL/2013111", 2774, 15);
         System.out.println(cs.getCommonname());
         assertTrue(cs != null);
+    }
+
+    @Test
+    public void testUpdateCatchSample() throws Exception {
+        System.out.println("testUpdateCatchsample");
+        BioticConnectionV3 instance = new BioticConnectionV3(this.url);
+        CatchsampleType cs = instance.getCatchSample("Forskningsfartøy/2013/G.O.Sars_LMEL/2013111", 2774, 15);
+        ZonedDateTime now = ZonedDateTime.now();
+        cs.setCatchcomment("testGetCatchsample" + now.toString());
+        instance.updateCatchsample("Forskningsfartøy/2013/G.O.Sars_LMEL/2013111", 2774, 15, cs, now);
+        CatchsampleType cs2 = instance.getCatchSample("Forskningsfartøy/2013/G.O.Sars_LMEL/2013111", 2774, 15);
+        assertTrue(cs2 != null);
+        assertTrue(!cs2.getCatchcomment().equals(cs.getCatchcomment()));
+
     }
 
 }

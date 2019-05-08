@@ -14,11 +14,13 @@ import java.net.URI;
 public class BioticAPIException extends Exception {
 
     Integer responsecode;
+    String responsemessage;
     URI uri;
     
-    public BioticAPIException(Integer response, URI uri) {
+    public BioticAPIException(Integer response, URI uri, String msg) {
         this.responsecode = response;
         this.uri = uri;
+        this.responsemessage = msg;
     }
     
     /**
@@ -28,6 +30,10 @@ public class BioticAPIException extends Exception {
      */
     public Integer getResponse(){
         return this.responsecode;
+    }
+    
+    public String getResponseMessage(){
+        return this.responsemessage;
     }
     
     /**
@@ -40,7 +46,8 @@ public class BioticAPIException extends Exception {
     
     @Override
     public String toString(){
-        String stringrep = "return code: " + this.responsecode +" ("+this.uri.toString()+")";
+        String stringrep = "" + this.responsecode + ", " + this.responsemessage + " ("+this.uri.toString()+")";
+        System.out.println(stringrep);
         return stringrep;
     }
 }

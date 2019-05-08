@@ -5,16 +5,18 @@
  */
 package imr.fd.ef.datarecoder.Biotic;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +24,9 @@ import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
@@ -90,7 +94,8 @@ public class BioticConnectionV3 {
         Integer response = conn.getResponseCode();
 
         if (response != 200) {
-            throw new BioticAPIException(response, uri);
+            String responsemsg = conn.getResponseMessage();
+            throw new BioticAPIException(response, uri, responsemsg);
         }
 
         return conn.getInputStream();
@@ -101,15 +106,15 @@ public class BioticConnectionV3 {
             this.conn.disconnect();
         }
     }
-    
-    
+
     /**
      * return stream for writing put content
      *
      * @param path
      * @param query
      * @param content
-     * @param lastmodified time since epoch (1970-01-01T00:00:00Z) in milliseconds.
+     * @param lastmodified time since epoch (1970-01-01T00:00:00Z) in
+     * milliseconds.
      * @return
      * @throws IOException
      */
@@ -140,15 +145,15 @@ public class BioticConnectionV3 {
         conn.setRequestProperty("Authorization", "Basic " + Authenticator.getToken(baseuri.toASCIIString()));
         conn.setRequestProperty("Last-Modified", "" + lastmodified);
 
-        
         try {
             wr = conn.getOutputStream();
             wr.write(content.getBytes("UTF-8"));
 
             Integer response = conn.getResponseCode();
+
             if (response != 200) {
-                System.out.println(response);
-                throw new BioticAPIException(response, uri);
+                String responsemsg = conn.getResponseMessage();
+                throw new BioticAPIException(response, uri, responsemsg);
             }
         } finally {
             if (wr != null) {
@@ -345,16 +350,26 @@ public class BioticConnectionV3 {
      * @param slack slack time in minutes. Subtracted from lastmodified before
      * updating to allow for clock synchronization issues.
      */
-    public void updateCatchsample(String missionpath, Integer serialnumber, Integer catchsampleid, CatchsampleType catchsample, ZonedDateTime lastmodified, Integer slack) {
+    public void updateCatchsample(String missionpath, Integer serialnumber, Integer catchsampleid, CatchsampleType catchsample, ZonedDateTime lastmodified, Integer slack) throws JAXBException, IOException, BioticAPIException {
         ZonedDateTime lastmodifiedwithmargin = lastmodified.minusMinutes(slack);
-        String lastmodifiedstring = lastmodified.format(DateTimeFormatter.RFC_1123_DATE_TIME);
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        JAXBContext jaxbContext = JAXBContext.newInstance(no.imr.formats.nmdbiotic.v3.CatchsampleType.class);
+        Marshaller m = jaxbContext.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+        JAXBElement<no.imr.formats.nmdbiotic.v3.CatchsampleType> jaxbElement = new JAXBElement<>(new QName("http://www.imr.no/formats/nmdbiotic/v3", "catchsample", ""), no.imr.formats.nmdbiotic.v3.CatchsampleType.class, catchsample);
+
+        StringWriter sw = new StringWriter();
+        m.marshal(jaxbElement, sw);
+
+        this.put("model/mission/fishstation/" + serialnumber + "/catchsample/" + catchsampleid, "version=3.0", sw.toString(), lastmodifiedwithmargin.toEpochSecond() * 1000);
+
     }
 
     /**
      * updateCatchsample with a slack time of 10 minutes
      */
-    public void updateCatchsample(String missionpath, Integer serialnumber, Integer catchsampleid, CatchsampleType catchsample, ZonedDateTime lastmodified) {
+    public void updateCatchsample(String missionpath, Integer serialnumber, Integer catchsampleid, CatchsampleType catchsample, ZonedDateTime lastmodified) throws JAXBException, IOException, BioticAPIException {
         updateCatchsample(missionpath, serialnumber, catchsampleid, catchsample, lastmodified, 10);
     }
 

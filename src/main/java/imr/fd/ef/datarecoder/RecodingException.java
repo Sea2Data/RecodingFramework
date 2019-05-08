@@ -11,8 +11,8 @@ package imr.fd.ef.datarecoder;
  */
 public class RecodingException extends Exception {
 
-    public RecodingException(String data_must_be_fetched_before_performing_te) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public RecodingException(String msg) {
+        super(msg);
     }
     
 }

@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 
@@ -119,11 +121,15 @@ public class IdentificationRecoder implements IItemRecoder {
     }
 
     @Override
-    public void update() throws RecodingException {
+    public void update() {
         if (this.catchsample == null || !this.recoded) {
             throw new RecodingIssueException("Data must be fetched and recoded before performing update");
         }
-        this.bioticconnection.updateCatchsample(this.path, this.serialnumber, this.catchsampleid, this.catchsample, this.lastmodified);
+        try {
+            this.bioticconnection.updateCatchsample(this.path, this.serialnumber, this.catchsampleid, this.catchsample, this.lastmodified);
+        } catch (JAXBException | IOException | BioticAPIException ex) {
+            throw new RecodingIssueException(ex);
+        }
     }
 
 }
