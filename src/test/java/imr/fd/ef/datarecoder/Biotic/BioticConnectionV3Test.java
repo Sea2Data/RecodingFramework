@@ -6,7 +6,6 @@
 package imr.fd.ef.datarecoder.Biotic;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -33,21 +32,17 @@ public class BioticConnectionV3Test {
     protected String url;
     protected String urlencoding = "UTF-8";
 
-    public BioticConnectionV3Test() throws Exception{
+    public BioticConnectionV3Test() throws Exception {
         url = "http://tomcat7-test.imr.no:8080/apis/nmdapi/biotic/v3";
-        loadTestAuth();
-        try {
-            
-            Authenticator.getToken(url);
-        } catch (Exception e) {
-            Authenticator.setToken(url, BioticConnectionV3Test.loadTestAuth());
-        }
+    }
 
+    @org.junit.Before
+    public void setUp() throws Exception {
+            Authenticator.setToken(url, BioticConnectionV3Test.loadTestAuth());
     }
 
     protected static String loadTestAuth() throws Exception {
         InputStream input = BioticConnectionV3Test.class.getClassLoader().getResourceAsStream("testauth.properties");
-        System.out.println(input);
         Properties prop = new Properties();
 
         // load a properties file
@@ -56,7 +51,7 @@ public class BioticConnectionV3Test {
         // get the property value and print it out
         String user = prop.getProperty("testuser");
         String passwd = prop.getProperty("testpassword");
-        
+
         return user + ":" + passwd;
 
     }
@@ -139,7 +134,7 @@ public class BioticConnectionV3Test {
     /**
      * Test of findDataSets method, of class BioticConnectionV3.
      */
-    // @Test commented out to avoid traffic on API
+    @Test
     public void testFindDataSets_5args() throws Exception {
         System.out.println("findDataSets");
         Set<Integer> years = new HashSet<>();
@@ -161,7 +156,7 @@ public class BioticConnectionV3Test {
     /**
      * Test of findDataSets method, of class BioticConnectionV3.
      */
-    // @Test commented out to avoid traffic on API
+    @Test
     public void testFindDataSets_Set_Set() throws Exception {
         System.out.println("findDataSets");
         Set<Integer> years = new HashSet<>();
@@ -190,14 +185,20 @@ public class BioticConnectionV3Test {
         assertTrue(cs != null);
     }
 
+    /**
+     * test update catchsample
+     *
+     * @throws Exception
+     */
     @Test
     public void testUpdateCatchSample() throws Exception {
         System.out.println("testUpdateCatchsample");
         BioticConnectionV3 instance = new BioticConnectionV3(this.url);
         CatchsampleType cs = instance.getCatchSample("Forskningsfartøy/2013/G.O.Sars_LMEL/2013111", 2774, 15);
+        CatchsampleType csedit = instance.getCatchSample("Forskningsfartøy/2013/G.O.Sars_LMEL/2013111", 2774, 15);
         ZonedDateTime now = ZonedDateTime.now();
-        cs.setCatchcomment("testGetCatchsample" + now.toString());
-        instance.updateCatchsample("Forskningsfartøy/2013/G.O.Sars_LMEL/2013111", 2774, 15, cs, now);
+        csedit.setCatchcomment("testGetCatchsample" + now.toString());
+        instance.updateCatchsample("Forskningsfartøy/2013/G.O.Sars_LMEL/2013111", 2774, 15, csedit, now, 0);
         CatchsampleType cs2 = instance.getCatchSample("Forskningsfartøy/2013/G.O.Sars_LMEL/2013111", 2774, 15);
         assertTrue(cs2 != null);
         assertTrue(!cs2.getCatchcomment().equals(cs.getCatchcomment()));

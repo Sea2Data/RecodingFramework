@@ -73,6 +73,19 @@ public class BioticConnectionV3 {
         this.port = port;
     }
 
+    protected String handleResponse(HttpURLConnection conn) throws IOException{
+        BufferedReader in = null;
+            in = new BufferedReader(
+                    new InputStreamReader(conn.getErrorStream()));
+            String inputLine;
+            StringBuffer content = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            return content.toString();
+    }
+
     protected InputStream get(String path, String query) throws IOException, BioticAPIException {
 
         if (!path.startsWith("/")) {
@@ -95,6 +108,8 @@ public class BioticConnectionV3 {
 
         if (response != 200) {
             String responsemsg = conn.getResponseMessage();
+            responsemsg += handleResponse(conn);
+            
             throw new BioticAPIException(response, uri, responsemsg);
         }
 
@@ -109,6 +124,7 @@ public class BioticConnectionV3 {
 
     /**
      * return stream for writing put content
+     * Calls Authenticator.getToken for authentication
      *
      * @param path
      * @param query
@@ -133,7 +149,6 @@ public class BioticConnectionV3 {
         }
 
         URL url = new URL(uri.toASCIIString());
-        System.out.println(url);
         conn = (HttpURLConnection) url.openConnection();
         OutputStream wr = null;
         conn.setRequestMethod("PUT");
@@ -153,16 +168,13 @@ public class BioticConnectionV3 {
 
             if (response != 200) {
                 String responsemsg = conn.getResponseMessage();
+                responsemsg += handleResponse(conn);
                 throw new BioticAPIException(response, uri, responsemsg);
             }
         } finally {
             if (wr != null) {
-                try {
-                    wr.flush();
-                    wr.close();
-                } catch (IOException exception) {
-                    exception.printStackTrace();
-                }
+                wr.flush();
+                wr.close();
             }
             this.disconnect();
         }
@@ -362,7 +374,7 @@ public class BioticConnectionV3 {
         StringWriter sw = new StringWriter();
         m.marshal(jaxbElement, sw);
 
-        this.put("model/mission/fishstation/" + serialnumber + "/catchsample/" + catchsampleid, "version=3.0", sw.toString(), lastmodifiedwithmargin.toEpochSecond() * 1000);
+        this.put(missionpath + "/model/mission/fishstation/" + serialnumber + "/catchsample/" + catchsampleid, "version=3.0", sw.toString(), lastmodifiedwithmargin.toEpochSecond() * 1000);
 
     }
 
