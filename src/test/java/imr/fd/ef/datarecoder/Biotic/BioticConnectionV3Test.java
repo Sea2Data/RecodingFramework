@@ -9,19 +9,23 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.net.URLEncoder;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 import no.imr.formats.nmdcommon.v2.ListType;
-import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
@@ -57,11 +61,11 @@ public class BioticConnectionV3Test {
         instance.disconnect();
 
     }
-
+    
     /**
      * Test of put method, of class BioticConnectionV3.
      */
-    //@org.junit.Test
+    @org.junit.Test
     public void testPut() throws Exception {
         System.out.println("put");
 
@@ -73,9 +77,8 @@ public class BioticConnectionV3Test {
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime anhourago = now.minusHours(1);
 
-        String nowstring = now.format(DateTimeFormatter.RFC_1123_DATE_TIME);
         String oldstring = anhourago.format(DateTimeFormatter.RFC_1123_DATE_TIME);
-
+        
         cs.setCatchcomment(oldstring);
 
         JAXBContext jaxbContext = JAXBContext.newInstance(no.imr.formats.nmdbiotic.v3.CatchsampleType.class);
@@ -86,10 +89,27 @@ public class BioticConnectionV3Test {
         
         StringWriter sw = new StringWriter();
         m.marshal(jaxbElement, sw);
-
+        
         String result = sw.toString();
+
+        // fix this
+        result = result.replace(":ns2", "");
+        result = result.replace("ns2:", "");
+        System.out.print(result);
+        
+        // test update
         Authenticator.prompt(this.url);
-        instance.put(path + "/" + "model/mission/fishstation/2774/catchsample/15", "version=3.0", result, oldstring);
+        instance.put(path + "/" + "model/mission/fishstation/2774/catchsample/15", "version=3.0", result, now.toEpochSecond()*1000);
+        
+        // test that error is thrown when not authenticated correctly
+        try{
+            Authenticator.setToken(this.url, "wrongtoken");
+            instance.put(path + "/" + "model/mission/fishstation/2774/catchsample/15", "version=3.0", result, anhourago.toEpochSecond()*1000);            
+        }
+        catch(BioticAPIException e){
+            assertEquals(e.responsecode.intValue(),403);
+        }
+          
 
     }
 

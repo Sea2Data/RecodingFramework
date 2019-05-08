@@ -5,8 +5,12 @@
  */
 package imr.fd.ef.datarecoder.Biotic;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -32,7 +36,14 @@ public class Authenticator {
      * @return 
      */
     public static String getToken(String url){
-        return Authenticator.tokens.get(url);
+        if (!Authenticator.tokens.containsKey(url)){
+            throw new RuntimeException("token not provided for" + url);
+        }
+        try {
+            return Base64.getEncoder().encodeToString(Authenticator.tokens.get(url).getBytes("utf-8"));
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException("Unsupported encoding");
+        }
     }
 
     /**

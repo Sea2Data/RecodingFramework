@@ -7,23 +7,18 @@ package imr.fd.ef.datarecoder.Biotic;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -90,7 +85,7 @@ public class BioticConnectionV3 {
         URL url = new URL(uri.toASCIIString());
         conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-        conn.setRequestProperty("Accept", "application/xml");
+        conn.setRequestProperty("Accept", "application/xml; charset=UTF-8");
 
         Integer response = conn.getResponseCode();
 
@@ -106,40 +101,49 @@ public class BioticConnectionV3 {
             this.conn.disconnect();
         }
     }
-
+    
+    
     /**
      * return stream for writing put content
      *
      * @param path
      * @param query
      * @param content
+     * @param lastmodified time since epoch (1970-01-01T00:00:00Z) in milliseconds.
      * @return
      * @throws IOException
      */
-    protected void put(String path, String query, String content, String lastModifiedString) throws IOException, BioticAPIException {
+    protected void put(String path, String query, String content, long lastmodified) throws IOException, BioticAPIException {
         if (!path.startsWith("/")) {
             path = "/" + path;
         }
 
         URI uri;
+        URI baseuri;
         try {
             uri = new URI(this.scheme, null, this.host, this.port, this.path + path, query, null);
+            baseuri = new URI(this.scheme, null, this.host, this.port, this.path, null, null);
         } catch (URISyntaxException ex) {
             throw new RuntimeException("malformed uri");
         }
 
         URL url = new URL(uri.toASCIIString());
+        System.out.println(url);
         conn = (HttpURLConnection) url.openConnection();
-        OutputStreamWriter wr = null;
+        OutputStream wr = null;
         conn.setRequestMethod("PUT");
         conn.setDoOutput(true);
-        conn.setRequestProperty("Accept", "application/xml");
-        conn.setRequestProperty("User-Agent", "automaticRecoder");
-        conn.setRequestProperty("Authorization", "Basic " + Authenticator.getToken(uri.toASCIIString()));
-        conn.setRequestProperty("Last-Modified", lastModifiedString);
+        conn.setDoInput(true);
+        conn.setRequestProperty("Accept-Charset", "UTF-8");
+        conn.setRequestProperty("Content-Type", "application/xml");
+        conn.setRequestProperty("User-Agent", "testapp");
+        conn.setRequestProperty("Authorization", "Basic " + Authenticator.getToken(baseuri.toASCIIString()));
+        conn.setRequestProperty("Last-Modified", "" + lastmodified);
+
+        
         try {
-            wr = new OutputStreamWriter(conn.getOutputStream());
-            wr.write(content);
+            wr = conn.getOutputStream();
+            wr.write(content.getBytes("UTF-8"));
 
             Integer response = conn.getResponseCode();
             if (response != 200) {
