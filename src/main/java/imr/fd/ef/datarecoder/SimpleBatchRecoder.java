@@ -30,10 +30,10 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
      * Fetches data using fetch methods of registered itemrecoders, and run
      * their pre-recoding tests.
      *
-     * @throws RecodingException
+     * @throws RecodingDataTestException
      */
     @Override
-    public void fetchAndTestBatchPre() throws RecodingException {
+    public void fetchAndTestBatchPre() throws RecodingDataTestException {
         for (IItemRecoder ir : this.itemrecoders) {
             ir.fetch();
             ir.testPre();
@@ -54,7 +54,7 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
 
                 try {
                     ir.testPre();
-                } catch (RecodingException ex) {
+                } catch (RecodingDataTestException ex) {
                     report.add(ir, false, "Pre recoding test failed:" + ex.getMessage());
                     reported = true;
                 }
@@ -66,7 +66,7 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
             if (!reported) {
                 try {
                     ir.testPost();
-                } catch (RecodingException ex) {
+                } catch (RecodingDataTestException ex) {
                     report.add(ir, false, "Post recoding test failed: " + ex.getMessage());
                     reported = true;
                 }
@@ -74,13 +74,19 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
             if (!reported && !simulate) {
                 try {
                     ir.update();
-                } catch (RecodingException ex) {
+                    report.add(ir, true, "recoded");
+                    reported = true;
+                } catch (RecodingDataTestException ex) {
                     report.add(ir, false, "Update after recoding failed:" + ex.getMessage());
                     reported = true;
                 }
             }
-            report.add(ir, true, "");
-            reported = true;
+
+            if (!reported && simulate) {
+                report.add(ir, true, "simulated");
+                reported = true;
+            }
+            assert reported;
         }
         return report;
     }
@@ -89,10 +95,10 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
      * Fetches data using fetch methods resitered itemrecoders, and run their
      * post-recoding tests.
      *
-     * @throws RecodingException
+     * @throws RecodingDataTestException
      */
     @Override
-    public void fetchAndTestBatchPost() throws RecodingException {
+    public void fetchAndTestBatchPost() throws RecodingDataTestException {
         for (IItemRecoder ir : this.itemrecoders) {
             ir.fetch();
             ir.testPost();
@@ -108,30 +114,27 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
     public BatchRecodingReport listPlannedRecodings() {
         BatchRecodingReport report = new BatchRecodingReport();
         for (IItemRecoder ir : this.itemrecoders) {
-            report.add(ir, false, "Dry-run");
+            report.add(ir, true, "Planned");
         }
         return report;
     }
 
     /**
      * serializes batchrecoder
+     *
      * @param file
      * @throws FileNotFoundException
-     * @throws IOException 
+     * @throws IOException
      */
     @Override
     public void save(File file) throws FileNotFoundException, IOException {
         FileOutputStream fileOut = null;
         ObjectOutputStream objectOut = null;
-        try {
-            fileOut = new FileOutputStream(file);
-            objectOut = new ObjectOutputStream(fileOut);
-            objectOut.writeObject(this);
-
-        } finally {
-            objectOut.close();
-            fileOut.close();
-        }
+        fileOut = new FileOutputStream(file);
+        objectOut = new ObjectOutputStream(fileOut);
+        objectOut.writeObject(this);
+        objectOut.close();
+        fileOut.close();
 
     }
 

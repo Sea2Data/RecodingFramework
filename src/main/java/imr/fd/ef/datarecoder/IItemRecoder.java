@@ -30,7 +30,7 @@ public interface IItemRecoder extends Serializable{
      * Test fetched data to check that fetch is correctly specified.
      * Could involve anything that goes into a unit test, but is run on the actual data to be recoded.
      */
-    public void testPre() throws RecodingException;
+    public void testPre() throws RecodingDataTestException;
     
     /**
      * Transforms data to recoded form.
@@ -40,14 +40,14 @@ public interface IItemRecoder extends Serializable{
     /**
      * Tests recoded data.
      * Could involve anything that goes into a unit test, but is run on the actual data that has been recoded.
-     * @throws RecodingException 
+     * @throws RecodingDataTestException 
      */
-    public void testPost() throws RecodingException;
+    public void testPost() throws RecodingDataTestException;
     
     /**
      * Update database with corrected data.
      * This should consist of a single update call to the API
      */
-    public void update() throws RecodingException;
+    public void update() throws RecodingDataTestException;
     
 }

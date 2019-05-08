@@ -33,9 +33,9 @@ public interface IBatchRecoder extends Serializable{
     
     /**
      * Fetches data and checks conditions expected to hold pre-recoding
-     * @throws RecodingException 
+     * @throws RecodingDataTestException 
      */
-    public void fetchAndTestBatchPre() throws RecodingException;
+    public void fetchAndTestBatchPre() throws RecodingDataTestException;
     
     /**
      * Listing all registered recodings, without performing any tests or updates.
@@ -52,9 +52,9 @@ public interface IBatchRecoder extends Serializable{
     
     /**
      * Fetches data through API and checks conditions expected to hold post-recoding
-     * @throws RecodingException 
+     * @throws RecodingDataTestException 
      */
-    public void fetchAndTestBatchPost() throws RecodingException;
+    public void fetchAndTestBatchPost() throws RecodingDataTestException;
     
     public void save(File file) throws IOException;
     

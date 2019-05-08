@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -39,7 +40,7 @@ import no.imr.formats.nmdcommon.v2.RowElementType;
  *
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
-public class BioticConnectionV3 {
+public class BioticConnectionV3{
 
     protected String scheme = "http";
     protected String host;

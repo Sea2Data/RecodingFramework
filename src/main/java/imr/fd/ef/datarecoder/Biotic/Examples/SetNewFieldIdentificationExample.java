@@ -11,7 +11,7 @@ import imr.fd.ef.datarecoder.Biotic.BioticAPIException;
 import imr.fd.ef.datarecoder.Biotic.BioticConnectionV3;
 import imr.fd.ef.datarecoder.Biotic.BioticParsingException;
 import imr.fd.ef.datarecoder.IItemRecoder;
-import imr.fd.ef.datarecoder.RecodingException;
+import imr.fd.ef.datarecoder.RecodingDataTestException;
 import imr.fd.ef.datarecoder.SimpleBatchRecoder;
 import java.io.IOException;
 import java.io.PrintStream;

@@ -7,6 +7,7 @@ package imr.fd.ef.datarecoder;
 
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +23,12 @@ public class BatchRecodingReport implements Serializable{
     protected List<IItemRecoder> itemrecodings;
     protected List<Boolean> recodingstatus;
     protected List<String> reasons;
+    
+    public BatchRecodingReport(){
+        itemrecodings = new ArrayList<>();
+        recodingstatus = new ArrayList<>();
+        reasons = new ArrayList<>();
+    }
     
     public void add(IItemRecoder itemrecoder, Boolean status, String reason){
         this.itemrecodings.add(itemrecoder);

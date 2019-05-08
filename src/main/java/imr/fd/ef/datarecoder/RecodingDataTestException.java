@@ -6,12 +6,12 @@
 package imr.fd.ef.datarecoder;
 
 /**
- *
+ * To be used for flagging data tests performed during recoding
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
-public class RecodingException extends Exception {
+public class RecodingDataTestException extends Exception {
 
-    public RecodingException(String msg) {
+    public RecodingDataTestException(String msg) {
         super(msg);
     }
     

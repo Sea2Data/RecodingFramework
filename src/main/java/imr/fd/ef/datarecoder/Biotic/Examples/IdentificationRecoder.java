@@ -8,7 +8,7 @@ package imr.fd.ef.datarecoder.Biotic.Examples;
 import imr.fd.ef.datarecoder.Biotic.BioticAPIException;
 import imr.fd.ef.datarecoder.Biotic.BioticConnectionV3;
 import imr.fd.ef.datarecoder.IItemRecoder;
-import imr.fd.ef.datarecoder.RecodingException;
+import imr.fd.ef.datarecoder.RecodingDataTestException;
 import imr.fd.ef.datarecoder.RecodingIssueException;
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -72,12 +72,12 @@ public class IdentificationRecoder implements IItemRecoder {
     }
 
     @Override
-    public void testPre() throws RecodingException {
+    public void testPre() throws RecodingDataTestException {
         if (this.catchsample == null) {
             throw new RecodingIssueException("Data must be fetched before performing tests");
         }
         if (!this.legalTissueSampleValuesForRecoding.contains(this.catchsample.getTissuesample())) {
-            throw new RecodingException("Tissuesample: " + this.catchsample.getTissuesample() + " not among legal values for records to be recorded");
+            throw new RecodingDataTestException("Tissuesample: " + this.catchsample.getTissuesample() + " not among legal values for records to be recorded");
         }
     }
 
@@ -98,18 +98,18 @@ public class IdentificationRecoder implements IItemRecoder {
     }
 
     @Override
-    public void testPost() throws RecodingException {
+    public void testPost() throws RecodingDataTestException {
         if (this.catchsample == null || !this.recoded) {
             throw new RecodingIssueException("Data must be fetched and recoded before performing tests");
         }
         if (!this.legalTissueSampleValuesForRecoding.contains(this.catchsample.getTissuesample())) {
-            throw new RecodingException("Tissuesample: " + this.catchsample.getTissuesample() + " not among legal values for records to be recorded");
+            throw new RecodingDataTestException("Tissuesample: " + this.catchsample.getTissuesample() + " not among legal values for records to be recorded");
         }
 
         if (this.catchsample.getTissuesample().equals("6") && !this.catchsample.getIdentification().equals("1")) {
-            throw new RecodingException("Identification: " + this.catchsample.getIdentification() + " not correct for tissuesample: " + this.catchsample.getTissuesample());
+            throw new RecodingDataTestException("Identification: " + this.catchsample.getIdentification() + " not correct for tissuesample: " + this.catchsample.getTissuesample());
         } else if (this.catchsample.getTissuesample().equals("7") && !this.catchsample.getIdentification().equals("2")) {
-            throw new RecodingException("Identification: " + this.catchsample.getIdentification() + " not correct for tissuesample: " + this.catchsample.getTissuesample());
+            throw new RecodingDataTestException("Identification: " + this.catchsample.getIdentification() + " not correct for tissuesample: " + this.catchsample.getTissuesample());
         } else {
             assert false;
         }
