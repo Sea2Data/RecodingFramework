@@ -7,7 +7,7 @@ package imr.fd.ef.datarecoder.Biotic.Examples;
 
 import imr.fd.ef.datarecoder.Biotic.BioticAPIException;
 import imr.fd.ef.datarecoder.Biotic.BioticConnectionV3;
-import imr.fd.ef.datarecoder.IItemRecoder;
+import imr.fd.ef.datarecoder.Biotic.CatchsampleItemRecoder;
 import imr.fd.ef.datarecoder.RecodingDataTestException;
 import imr.fd.ef.datarecoder.RecodingIssueException;
 import java.io.IOException;
@@ -15,18 +15,16 @@ import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 
 /**
- * For updating a catchsample line with corrected codes for the field 'identification' introduced in biotic3.
+ * Example for updating a catchsample line with corrected codes for the field 'identification' introduced in biotic3.
  * This information was preciously coded in the field 'genetics' in biotic 1.4 which has been populated in the field 'tissuesample' in biotic 3.
  *
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
-public class IdentificationRecoder implements IItemRecoder {
+public class IdentificationRecoder extends CatchsampleItemRecoder {
 
     protected String delim = "|";
 
@@ -40,12 +38,7 @@ public class IdentificationRecoder implements IItemRecoder {
     Set<String> legalTissueSampleValuesForRecoding;
 
     public IdentificationRecoder(String path, Integer serialnumber, Integer catchsampleid, String biotic3url) throws URISyntaxException {
-        BioticConnectionV3.createBiotic3Conncetion(biotic3url); // testing url formatting
-        this.path = path;
-        this.serialnumber = serialnumber;
-        this.catchsampleid = catchsampleid;
-        this.biotic3url = biotic3url;
-        this.catchsample = null;
+        super(path, serialnumber, catchsampleid, biotic3url);
         
         this.legalTissueSampleValuesForRecoding = new HashSet<>();
         this.legalTissueSampleValuesForRecoding.add("7");
@@ -54,7 +47,7 @@ public class IdentificationRecoder implements IItemRecoder {
 
     @Override
     public String getDescription() {
-        String desc = this.path + this.delim + this.serialnumber + this.delim + this.catchsampleid;
+        String desc = super.getDescription();
         if (this.catchsample != null) {
             if (this.catchsample.getTissuesample().equals("6")) {
                 desc += "with tissuesample / genetics 6, setting identification to 1";

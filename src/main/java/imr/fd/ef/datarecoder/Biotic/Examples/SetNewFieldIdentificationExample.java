@@ -5,7 +5,6 @@
  */
 package imr.fd.ef.datarecoder.Biotic.Examples;
 
-import imr.fd.ef.datarecoder.BatchRecodingReport;
 import imr.fd.ef.datarecoder.BatchrecodingUI;
 import imr.fd.ef.datarecoder.Biotic.BioticAPIException;
 import imr.fd.ef.datarecoder.Biotic.BioticConnectionV3;
@@ -31,11 +30,12 @@ import no.imr.formats.nmdbiotic.v3.FishstationType;
  * be set based on deprecated, code in the 'tissuesample' field (which has been
  * populated with records from the 'genetics' field in biotic 1.4
  *
+ * In order to maintain serializability,  the parent member apiurl are passed to BioticConnectionV3 constructurs when API connection is needed, rather than including as a member in this class.
+ * 
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
 public class SetNewFieldIdentificationExample extends SimpleBatchRecoder {
 
-    protected SimpleBatchRecoder batchrecoder;
     protected int firstyear;
     protected int lastyear;
 
@@ -54,8 +54,11 @@ public class SetNewFieldIdentificationExample extends SimpleBatchRecoder {
         
     }
 
+    //
+    // Implement lookup of data sets and search for entries to recode here. Add item recodings via this.addItemRecoder
+    //
     @Override
-    public void makeBatchRecoder(PrintStream progress) throws IOException, JAXBException, BioticAPIException, BioticParsingException {
+    public void searchForItemRecoders(PrintStream progress) throws IOException, JAXBException, BioticAPIException, BioticParsingException {
 
         BioticConnectionV3 bioticconn;
         try {
@@ -118,13 +121,25 @@ public class SetNewFieldIdentificationExample extends SimpleBatchRecoder {
                 + " Recoding is applied for all data in the years: " + this.firstyear + "-" + this.lastyear + ", inclusive.";
     }
 
+    //
+    // implement main in standardized way for running recodings
+    //
     public static void main(String... args) throws Exception {
+        
+        //
+        // hard-code all parameters that defines the recoding at this point. 
+        // The program is supposed to document the recoding, and these parameters are therefore not supposed to be configurable.
+        // 
+        
         String url = "http://tomcat7-test.imr.no:8080/apis/nmdapi/biotic/v3";
         String key = null;
         int firstyear = 2013;
         int lastyear = 2013;
         SetNewFieldIdentificationExample ex = new SetNewFieldIdentificationExample(url, firstyear, lastyear);
 
+        //
+        // call BatchrecodingUI for standardized running of recodings.
+        //
         BatchrecodingUI ui = new BatchrecodingUI(ex);
         ui.cli(args);
     }

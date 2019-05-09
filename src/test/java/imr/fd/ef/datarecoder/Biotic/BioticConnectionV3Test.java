@@ -41,7 +41,7 @@ public class BioticConnectionV3Test {
             Authenticator.setToken(url, BioticConnectionV3Test.loadTestAuth());
     }
 
-    protected static String loadTestAuth() throws Exception {
+    public static String loadTestAuth() throws Exception {
         InputStream input = BioticConnectionV3Test.class.getClassLoader().getResourceAsStream("testauth.properties");
         Properties prop = new Properties();
 

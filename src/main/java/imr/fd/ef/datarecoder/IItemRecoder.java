@@ -11,6 +11,7 @@ import java.io.Serializable;
  * Interface for recoding an item in a database.
  * To be used for atomic recoding, that either fails or completely succeeds (one single update call to API).
  * To be used for automatic database updates correcting for consistent mistakes in data, or to reflect changes in data model.
+ * Implementing classes must maintain serializability in order to used with implementations of IBatchRecoder, such as SimpleBatchRecoder.
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
 public interface IItemRecoder extends Serializable{

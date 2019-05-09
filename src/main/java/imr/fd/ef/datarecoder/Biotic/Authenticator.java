@@ -43,6 +43,15 @@ public class Authenticator {
             throw new RuntimeException("Unsupported encoding");
         }
     }
+    
+    /**
+     * Checks if token for given url is registered
+     * @param url
+     * @return 
+     */
+    public static boolean hasToken(String url){
+        return Authenticator.tokens.containsKey(url);
+    }
 
     /**
      * Provide dialog box for getting token for a url

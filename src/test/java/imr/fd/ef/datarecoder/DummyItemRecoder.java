@@ -3,16 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package imr.fd.ef.datarecoder.Biotic;
+package imr.fd.ef.datarecoder;
 
-import imr.fd.ef.datarecoder.IItemRecoder;
-import imr.fd.ef.datarecoder.RecodingDataTestException;
-import imr.fd.ef.datarecoder.RecodingIssueException;
+import imr.fd.ef.datarecoder.Biotic.BioticAPIException;
+import imr.fd.ef.datarecoder.Biotic.BioticConnectionV3;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import no.imr.formats.nmdbiotic.v3.CatchsampleType;
 
@@ -30,33 +27,29 @@ public class DummyItemRecoder implements IItemRecoder{
     CatchsampleType catchsample;
     ZonedDateTime lastmodified;
     String newcomment;
-    String oldcomment;
-    String setcomment;
     
     /**
-     * Constructs dummy recoder that recodes comment if comment is expected comment
-     * sets the comment setcomment after fetching
+     * Constructs dummy recoder that recodes comment if comment is not equal to newcomment
      * @param path
      * @param serialnumber
      * @param catchsampleid
      * @param biotic3url
      */
-    public DummyItemRecoder(String path, Integer serialnumber, Integer catchsampleid, String biotic3url) throws URISyntaxException {
+    public DummyItemRecoder(String path, Integer serialnumber, Integer catchsampleid, String biotic3url, String newcomment) throws URISyntaxException {
         BioticConnectionV3.createBiotic3Conncetion(biotic3url); // testing url formatting
         this.path = path;
         this.serialnumber = serialnumber;
         this.catchsampleid = catchsampleid;
         this.biotic3url = biotic3url;
         this.catchsample = null;
-        ZonedDateTime now = ZonedDateTime.now();
-        this.newcomment = "DummyItemReoder" + now.toString();
+        this.newcomment = newcomment;
       
     }
     
     @Override
     public String getDescription() {
         String desc = this.path + this.delim + this.serialnumber + this.delim + this.catchsampleid;
-        desc += ". Sets Catchsample comment of to DummyItemReoder + date";
+        desc += ". Sets Catchsample comment to " + this.newcomment;
         return desc;
     }
 

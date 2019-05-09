@@ -9,6 +9,7 @@ import imr.fd.ef.datarecoder.Biotic.Authenticator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.io.PrintStream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -24,10 +25,32 @@ import org.apache.commons.cli.ParseException;
 public class BatchrecodingUI {
 
     protected IBatchRecoder batchrecoder;
+    protected PrintStream progress;
 
+    /**
+     * Constructs UI that prints verbose progress messages to System.out
+     * @param batchrecoder recoder that UI is interfacing
+     */
     public BatchrecodingUI(IBatchRecoder batchrecoder) {
         this.batchrecoder = batchrecoder;
+        this.progress = System.out;
     }
+    
+     /**
+     * Constructs UI
+     * @param batchrecoder recoder that UI is interfacing
+     * @param verbose
+     */
+    public BatchrecodingUI(IBatchRecoder batchrecoder, boolean verbose) {
+        this.batchrecoder = batchrecoder;
+        if (verbose){
+            this.progress = System.out;
+        }
+        else{
+            this.progress = null;
+        }
+    }
+
 
     /**
      * Initiates command line interface with the given command line arguments
@@ -48,7 +71,7 @@ public class BatchrecodingUI {
         try {
             cmd = parser.parse(options, args);
         } catch (ParseException ex) {
-            System.out.println("Could not parse arguments");
+            System.err.println("Could not parse arguments");
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(this.batchrecoder.getDescription(), options);
 
@@ -62,7 +85,7 @@ public class BatchrecodingUI {
             
             String filename = cmd.getOptionValue("c");
             System.out.println("Making batch recoder");
-            this.batchrecoder.makeBatchRecoder(System.out);
+            this.batchrecoder.searchForItemRecoders(this.progress);
             System.out.println("Saving batch recoder to " + filename);
             File file = new File(filename);
             this.batchrecoder.save(file);
@@ -84,7 +107,11 @@ public class BatchrecodingUI {
             
             String filename = cmd.getOptionValue("r");
             System.out.println("Loading batch recoder from " + filename);
-            Authenticator.prompt(this.batchrecoder.getURL());
+            
+            if (!Authenticator.hasToken(this.batchrecoder.getURL())){
+                Authenticator.prompt(this.batchrecoder.getURL());
+            }
+
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
             this.batchrecoder = (IBatchRecoder)in.readObject();
             System.out.println("Running pre-recoding data checks ...");

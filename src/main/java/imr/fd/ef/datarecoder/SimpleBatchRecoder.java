@@ -16,14 +16,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
+ * Base implementation for Batch recodings, facilitating reuse of common operations.
+ * Implementions of searchForItemRecoders(PrintStream) should populate add IItemRecoder instances via addItemRecoder(IItemRecoder)
  * @author Edvin Fuglebakk edvin.fuglebakk@imr.no
  */
 public abstract class SimpleBatchRecoder implements IBatchRecoder {
     
-    List<IItemRecoder> itemrecoders = new LinkedList<>();
+    protected List<IItemRecoder> itemrecoders = new LinkedList<>();
     protected String apiurl;
 
+    /**
+     * Constructs simple batch recoder for recoding through the API identified by the string url
+     * @param url
+     * @throws URISyntaxException 
+     */
     public SimpleBatchRecoder(String url) throws URISyntaxException{
         this.apiurl = url;
     }
@@ -32,12 +38,7 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
         this.itemrecoders.add(itemrecoder);
     }
 
-    /**
-     * Fetches data using fetch methods of registered itemrecoders, and run
-     * their pre-recoding tests.
-     *
-     * @throws RecodingDataTestException
-     */
+
     @Override
     public void fetchAndTestBatchPre() throws RecodingDataTestException {
         for (IItemRecoder ir : this.itemrecoders) {
@@ -97,12 +98,7 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
         return report;
     }
 
-    /**
-     * Fetches data using fetch methods resitered itemrecoders, and run their
-     * post-recoding tests.
-     *
-     * @throws RecodingDataTestException
-     */
+
     @Override
     public void fetchAndTestBatchPost() throws RecodingDataTestException {
         for (IItemRecoder ir : this.itemrecoders) {
@@ -111,11 +107,7 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
         }
     }
 
-    /**
-     * Lists all recodings of this batch recoder
-     *
-     * @return
-     */
+
     @Override
     public BatchRecodingReport listPlannedRecodings() {
         BatchRecodingReport report = new BatchRecodingReport();
@@ -125,13 +117,7 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
         return report;
     }
 
-    /**
-     * serializes batchrecoder
-     *
-     * @param file
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
+
     @Override
     public void save(File file) throws FileNotFoundException, IOException {
         FileOutputStream fileOut = null;
@@ -145,14 +131,13 @@ public abstract class SimpleBatchRecoder implements IBatchRecoder {
     }
 
     @Override
-    public abstract void makeBatchRecoder(PrintStream progress) throws Exception;
+    public abstract void searchForItemRecoders(PrintStream progress) throws Exception;
+    
+    @Override
+    public void clearItemRecoders(){
+        this.itemrecoders.clear();
+    }
 
-    /**
-     * Detailed description of batch recoder. Should clearly explain the
-     * recoding for documentation purposes.
-     *
-     * @return
-     */
     @Override
     public abstract String getDescription();
     

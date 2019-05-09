@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -46,7 +45,7 @@ public class BioticConnectionV3{
     protected String host;
     protected String path;
     protected Integer port = 8080;
-    protected HttpURLConnection conn;
+    protected HttpURLConnection conn; // prevents implementing serializable
     protected String urlencoding = "UTF-8";
 
     public BioticConnectionV3(String url) throws URISyntaxException {
